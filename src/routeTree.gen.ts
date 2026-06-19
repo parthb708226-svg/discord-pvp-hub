@@ -9,38 +9,234 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TierSlugRouteImport } from './routes/tier.$slug'
+import { Route as PlayerUsernameRouteImport } from './routes/player.$username'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminTiersRouteImport } from './routes/_authenticated/admin.tiers'
+import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
+import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
+import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/public/discord/interactions'
+import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
+import { Route as ApiAuthDiscordCallbackRouteImport } from './routes/api/auth/discord/callback'
 
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TierSlugRoute = TierSlugRouteImport.update({
+  id: '/tier/$slug',
+  path: '/tier/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayerUsernameRoute = PlayerUsernameRouteImport.update({
+  id: '/player/$username',
+  path: '/player/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminTiersRoute = AuthenticatedAdminTiersRouteImport.update({
+  id: '/tiers',
+  path: '/tiers',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminGamemodesRoute =
+  AuthenticatedAdminGamemodesRouteImport.update({
+    id: '/gamemodes',
+    path: '/gamemodes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBotRoute = AuthenticatedAdminBotRouteImport.update({
+  id: '/bot',
+  path: '/bot',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const ApiPublicDiscordInteractionsRoute =
+  ApiPublicDiscordInteractionsRouteImport.update({
+    id: '/api/public/discord/interactions',
+    path: '/api/public/discord/interactions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAuthDiscordStartRoute = ApiAuthDiscordStartRouteImport.update({
+  id: '/api/auth/discord/start',
+  path: '/api/auth/discord/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthDiscordCallbackRoute = ApiAuthDiscordCallbackRouteImport.update({
+  id: '/api/auth/discord/callback',
+  path: '/api/auth/discord/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/player/$username': typeof PlayerUsernameRoute
+  '/tier/$slug': typeof TierSlugRoute
+  '/admin/bot': typeof AuthenticatedAdminBotRoute
+  '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/tiers': typeof AuthenticatedAdminTiersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
+  '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/player/$username': typeof PlayerUsernameRoute
+  '/tier/$slug': typeof TierSlugRoute
+  '/admin/bot': typeof AuthenticatedAdminBotRoute
+  '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/tiers': typeof AuthenticatedAdminTiersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
+  '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/player/$username': typeof PlayerUsernameRoute
+  '/tier/$slug': typeof TierSlugRoute
+  '/_authenticated/admin/bot': typeof AuthenticatedAdminBotRoute
+  '/_authenticated/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/_authenticated/admin/tiers': typeof AuthenticatedAdminTiersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
+  '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/leaderboard'
+    | '/admin'
+    | '/player/$username'
+    | '/tier/$slug'
+    | '/admin/bot'
+    | '/admin/gamemodes'
+    | '/admin/tiers'
+    | '/admin/users'
+    | '/admin/'
+    | '/api/auth/discord/callback'
+    | '/api/auth/discord/start'
+    | '/api/public/discord/interactions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/leaderboard'
+    | '/player/$username'
+    | '/tier/$slug'
+    | '/admin/bot'
+    | '/admin/gamemodes'
+    | '/admin/tiers'
+    | '/admin/users'
+    | '/admin'
+    | '/api/auth/discord/callback'
+    | '/api/auth/discord/start'
+    | '/api/public/discord/interactions'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/leaderboard'
+    | '/_authenticated/admin'
+    | '/player/$username'
+    | '/tier/$slug'
+    | '/_authenticated/admin/bot'
+    | '/_authenticated/admin/gamemodes'
+    | '/_authenticated/admin/tiers'
+    | '/_authenticated/admin/users'
+    | '/_authenticated/admin/'
+    | '/api/auth/discord/callback'
+    | '/api/auth/discord/start'
+    | '/api/public/discord/interactions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  PlayerUsernameRoute: typeof PlayerUsernameRoute
+  TierSlugRoute: typeof TierSlugRoute
+  ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
+  ApiAuthDiscordStartRoute: typeof ApiAuthDiscordStartRoute
+  ApiPublicDiscordInteractionsRoute: typeof ApiPublicDiscordInteractionsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +244,126 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tier/$slug': {
+      id: '/tier/$slug'
+      path: '/tier/$slug'
+      fullPath: '/tier/$slug'
+      preLoaderRoute: typeof TierSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/player/$username': {
+      id: '/player/$username'
+      path: '/player/$username'
+      fullPath: '/player/$username'
+      preLoaderRoute: typeof PlayerUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tiers': {
+      id: '/_authenticated/admin/tiers'
+      path: '/tiers'
+      fullPath: '/admin/tiers'
+      preLoaderRoute: typeof AuthenticatedAdminTiersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/gamemodes': {
+      id: '/_authenticated/admin/gamemodes'
+      path: '/gamemodes'
+      fullPath: '/admin/gamemodes'
+      preLoaderRoute: typeof AuthenticatedAdminGamemodesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/bot': {
+      id: '/_authenticated/admin/bot'
+      path: '/bot'
+      fullPath: '/admin/bot'
+      preLoaderRoute: typeof AuthenticatedAdminBotRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/discord/interactions': {
+      id: '/api/public/discord/interactions'
+      path: '/api/public/discord/interactions'
+      fullPath: '/api/public/discord/interactions'
+      preLoaderRoute: typeof ApiPublicDiscordInteractionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/discord/start': {
+      id: '/api/auth/discord/start'
+      path: '/api/auth/discord/start'
+      fullPath: '/api/auth/discord/start'
+      preLoaderRoute: typeof ApiAuthDiscordStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/discord/callback': {
+      id: '/api/auth/discord/callback'
+      path: '/api/auth/discord/callback'
+      fullPath: '/api/auth/discord/callback'
+      preLoaderRoute: typeof ApiAuthDiscordCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBotRoute: typeof AuthenticatedAdminBotRoute
+  AuthenticatedAdminGamemodesRoute: typeof AuthenticatedAdminGamemodesRoute
+  AuthenticatedAdminTiersRoute: typeof AuthenticatedAdminTiersRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBotRoute: AuthenticatedAdminBotRoute,
+  AuthenticatedAdminGamemodesRoute: AuthenticatedAdminGamemodesRoute,
+  AuthenticatedAdminTiersRoute: AuthenticatedAdminTiersRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  PlayerUsernameRoute: PlayerUsernameRoute,
+  TierSlugRoute: TierSlugRoute,
+  ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
+  ApiAuthDiscordStartRoute: ApiAuthDiscordStartRoute,
+  ApiPublicDiscordInteractionsRoute: ApiPublicDiscordInteractionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
