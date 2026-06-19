@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
     const userId = (context as any).user?.id;
     if (!userId) throw redirect({ to: "/auth" });
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    const roles = (data ?? []).map(r => r.role);
+    const roles = (data ?? []).map((r: { role: string }) => r.role);
     if (!roles.some(r => r === "owner" || r === "admin" || r === "tester")) {
       throw redirect({ to: "/" });
     }
@@ -17,17 +17,17 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminShell,
 });
 
-const NAV = [
+const NAV: Array<{ to: string; label: string; exact?: boolean; adminOnly?: boolean }> = [
   { to: "/admin", label: "Dashboard", exact: true },
   { to: "/admin/tiers", label: "Tiers" },
   { to: "/admin/gamemodes", label: "Gamemodes", adminOnly: true },
   { to: "/admin/users", label: "Users & Roles", adminOnly: true },
   { to: "/admin/bot", label: "Discord Bot", adminOnly: true },
-] as const;
+];
 
 function AdminShell() {
   const { roles } = Route.useRouteContext();
-  const isAdmin = roles.some(r => r === "owner" || r === "admin");
+  const isAdmin = roles.some((r: string) => r === "owner" || r === "admin");
   const pathname = useRouterState({ select: s => s.location.pathname });
   return (
     <div className="min-h-screen">
@@ -37,7 +37,7 @@ function AdminShell() {
           <Card className="p-2 pixel-border">
             <nav className="flex flex-col gap-1">
               {NAV.filter(n => !n.adminOnly || isAdmin).map(n => {
-                const active = (n as any).exact ? pathname === n.to : pathname.startsWith(n.to);
+                const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
                 return (
                   <Link key={n.to} to={n.to as any}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${active ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}>
