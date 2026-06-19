@@ -46,8 +46,7 @@ function BotConfig() {
 
       <Card className="p-6 space-y-3">
         <h2 className="font-bold text-lg">3. Invite the bot to your server</h2>
-        <Copyable value={`https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_APP_ID ?? "YOUR_APP_ID"}&permissions=2147551232&scope=bot%20applications.commands`} />
-        <p className="text-xs text-muted-foreground">If the link above shows "YOUR_APP_ID", paste your Discord application ID into the URL manually (it's 1177585523385188402).</p>
+        <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands`} />
       </Card>
     </div>
   );
