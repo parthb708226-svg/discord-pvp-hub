@@ -86,6 +86,106 @@ export const Route = createFileRoute("/api/public/discord/interactions")({
               return reply(`**${opts.player}**\n${lines}\n${origin}/player/${encodeURIComponent(opts.player)}`);
             }
 
+            // ---------- Moderation ----------
+            const MOD_LOG_CHANNEL = "1517734779699724458";
+            const guildId = body.guild_id ?? process.env.DISCORD_GUILD_ID!;
+            const botToken = process.env.DISCORD_BOT_TOKEN!;
+            const discordApi = (path: string, init: RequestInit = {}) =>
+              fetch(`https://discord.com/api/v10${path}`, {
+                ...init,
+                headers: {
+                  Authorization: `Bot ${botToken}`,
+                  "Content-Type": "application/json",
+                  ...(init.headers ?? {}),
+                  ...(opts.reason ? { "X-Audit-Log-Reason": encodeURIComponent(opts.reason).slice(0, 500) } : {}),
+                },
+              });
+            const modLog = (content: string) =>
+              fetch(`https://discord.com/api/v10/channels/${MOD_LOG_CHANNEL}/messages`, {
+                method: "POST",
+                headers: { Authorization: `Bot ${botToken}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+              }).catch(e => console.error("[modlog]", e));
+
+            const isModCommand = ["warn", "warnings", "mute", "unmute", "kick", "ban", "unban"].includes(cmd);
+            if (isModCommand) {
+              const actorId = body.member?.user?.id ?? body.user?.id;
+              const actorName = body.member?.user?.username ?? body.user?.username ?? "unknown";
+              const { data: actorProfile } = await supabaseAdmin.from("profiles").select("id").eq("discord_id", actorId).maybeSingle();
+              if (!actorProfile) return reply("❌ Sign in on the website first.", true);
+              const { data: actorRoles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", actorProfile.id);
+              const isAdmin = (actorRoles ?? []).some((r: any) => ["owner", "admin"].includes(r.role));
+              if (!isAdmin) return reply("❌ Admins only.", true);
+
+              const targetId = opts.user ?? opts.user_id;
+              const reason = opts.reason ?? "No reason provided";
+
+              if (cmd === "warn") {
+                const tu = await discordApi(`/users/${targetId}`).then(r => r.ok ? r.json() : null).catch(() => null);
+                const targetName = (tu as any)?.username ?? targetId;
+                await supabaseAdmin.from("warnings").insert({
+                  discord_id: targetId, discord_username: targetName, reason,
+                  moderator_discord_id: actorId, moderator_username: actorName,
+                });
+                modLog(`⚠️ **WARN** <@${targetId}> by <@${actorId}>\n**Reason:** ${reason}`);
+                return reply(`⚠️ Warned <@${targetId}> — ${reason}`);
+              }
+
+              if (cmd === "warnings") {
+                const { data: rows } = await supabaseAdmin.from("warnings").select("reason, moderator_username, created_at").eq("discord_id", targetId).order("created_at", { ascending: false }).limit(10);
+                if (!rows || rows.length === 0) return reply(`<@${targetId}> has no warnings.`, true);
+                const lines2 = rows.map((r: any, i: number) => `${i + 1}. ${r.reason} — *by ${r.moderator_username} on ${new Date(r.created_at).toLocaleDateString()}*`).join("\n");
+                return reply(`**Warnings for <@${targetId}>** (${rows.length})\n${lines2}`, true);
+              }
+
+              if (cmd === "mute") {
+                const minutes = Math.max(1, Math.min(40320, parseInt(opts.minutes, 10) || 0));
+                const until = new Date(Date.now() + minutes * 60_000).toISOString();
+                const res = await discordApi(`/guilds/${guildId}/members/${targetId}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ communication_disabled_until: until }),
+                });
+                if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+                modLog(`🔇 **MUTE** <@${targetId}> for **${minutes}m** by <@${actorId}>\n**Reason:** ${reason}`);
+                return reply(`🔇 Muted <@${targetId}> for ${minutes}m.`);
+              }
+
+              if (cmd === "unmute") {
+                const res = await discordApi(`/guilds/${guildId}/members/${targetId}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ communication_disabled_until: null }),
+                });
+                if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+                modLog(`🔊 **UNMUTE** <@${targetId}> by <@${actorId}>`);
+                return reply(`🔊 Unmuted <@${targetId}>.`);
+              }
+
+              if (cmd === "kick") {
+                const res = await discordApi(`/guilds/${guildId}/members/${targetId}`, { method: "DELETE" });
+                if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+                modLog(`👢 **KICK** <@${targetId}> by <@${actorId}>\n**Reason:** ${reason}`);
+                return reply(`👢 Kicked <@${targetId}>.`);
+              }
+
+              if (cmd === "ban") {
+                const days = Math.max(0, Math.min(7, parseInt(opts.delete_days ?? "0", 10) || 0));
+                const res = await discordApi(`/guilds/${guildId}/bans/${targetId}`, {
+                  method: "PUT",
+                  body: JSON.stringify({ delete_message_seconds: days * 86400 }),
+                });
+                if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+                modLog(`🔨 **BAN** <@${targetId}> by <@${actorId}>\n**Reason:** ${reason}`);
+                return reply(`🔨 Banned <@${targetId}>.`);
+              }
+
+              if (cmd === "unban") {
+                const res = await discordApi(`/guilds/${guildId}/bans/${targetId}`, { method: "DELETE" });
+                if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+                modLog(`♻️ **UNBAN** <@${targetId}> by <@${actorId}>\n**Reason:** ${reason}`);
+                return reply(`♻️ Unbanned <@${targetId}>.`);
+              }
+            }
+
             return reply("Unknown command.");
           } catch (e) {
             console.error("[discord-cmd]", e);
