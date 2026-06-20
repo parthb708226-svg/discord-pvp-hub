@@ -166,6 +166,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_levels: {
+        Row: {
+          created_at: string
+          discord_id: string
+          discord_username: string | null
+          last_message_at: string | null
+          level: number
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          discord_id: string
+          discord_username?: string | null
+          last_message_at?: string | null
+          level?: number
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          discord_id?: string
+          discord_username?: string | null
+          last_message_at?: string | null
+          level?: number
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
