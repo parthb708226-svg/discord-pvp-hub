@@ -43,6 +43,66 @@ export const registerBotCommands = createServerFn({ method: "POST" })
         description: "Show all tiers for a player",
         options: [{ name: "player", description: "Minecraft username", type: 3, required: true }],
       },
+      // ---------------- Moderation (admin only) ----------------
+      {
+        name: "warn",
+        description: "Warn a member (admin only)",
+        default_member_permissions: "0",
+        options: [
+          { name: "user", description: "Member to warn", type: 6, required: true },
+          { name: "reason", description: "Why are they being warned?", type: 3, required: true },
+        ],
+      },
+      {
+        name: "warnings",
+        description: "List a member's warnings",
+        default_member_permissions: "0",
+        options: [{ name: "user", description: "Member", type: 6, required: true }],
+      },
+      {
+        name: "mute",
+        description: "Timeout a member for N minutes (admin only)",
+        default_member_permissions: "0",
+        options: [
+          { name: "user", description: "Member to mute", type: 6, required: true },
+          { name: "minutes", description: "Duration in minutes (max 40320 = 28d)", type: 4, required: true },
+          { name: "reason", description: "Reason", type: 3, required: false },
+        ],
+      },
+      {
+        name: "unmute",
+        description: "Remove a member's timeout (admin only)",
+        default_member_permissions: "0",
+        options: [{ name: "user", description: "Member", type: 6, required: true }],
+      },
+      {
+        name: "kick",
+        description: "Kick a member (admin only)",
+        default_member_permissions: "0",
+        options: [
+          { name: "user", description: "Member to kick", type: 6, required: true },
+          { name: "reason", description: "Reason", type: 3, required: false },
+        ],
+      },
+      {
+        name: "ban",
+        description: "Ban a member (admin only)",
+        default_member_permissions: "0",
+        options: [
+          { name: "user", description: "Member to ban", type: 6, required: true },
+          { name: "reason", description: "Reason", type: 3, required: false },
+          { name: "delete_days", description: "Delete N days of their messages (0-7)", type: 4, required: false },
+        ],
+      },
+      {
+        name: "unban",
+        description: "Unban a user by ID (admin only)",
+        default_member_permissions: "0",
+        options: [
+          { name: "user_id", description: "Discord user ID to unban", type: 3, required: true },
+          { name: "reason", description: "Reason", type: 3, required: false },
+        ],
+      },
     ];
 
     const url = `https://discord.com/api/v10/applications/${appId}/guilds/${guildId}/commands`;

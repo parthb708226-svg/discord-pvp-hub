@@ -217,6 +217,36 @@ export type Database = {
         }
         Relationships: []
       }
+      warnings: {
+        Row: {
+          created_at: string
+          discord_id: string
+          discord_username: string | null
+          id: string
+          moderator_discord_id: string
+          moderator_username: string | null
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          discord_id: string
+          discord_username?: string | null
+          id?: string
+          moderator_discord_id: string
+          moderator_username?: string | null
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          discord_id?: string
+          discord_username?: string | null
+          id?: string
+          moderator_discord_id?: string
+          moderator_username?: string | null
+          reason?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
