@@ -1,59 +1,44 @@
-# Discord Gateway Bot — Railway Deploy Guide
+# PvP Tiers Gateway Bot
 
-This is a minimal gateway bot that keeps your Discord bot showing **Online**.  
-All slash commands still route through your main Lovable app (already configured).
+Keeps the bot **Online** and handles realtime events (welcome, chat levels, chat gate).
+Slash commands still go through the Lovable website — this gateway only handles things
+that need a persistent WebSocket connection.
 
----
+## Features
 
-## 1. Add this folder to Railway
+- ✅ Shows the bot as **Online** with "Watching PvP Tiers" status
+- 👋 Welcomes new members in channel `1517732915201577070`
+- 🔒 **Chat gate** — deletes messages from users who haven't logged into the website,
+  DMs them a link to sign in
+- 🎉 **Chat levels** — earn 15-25 XP per message (60s cooldown), DM on level up.
+  Stored in the `user_levels` table.
+- 🏆 Tier announcements in `1517732611865444372` are posted by the website itself
+  when `/settier` runs — no action needed here.
 
-### Option A: GitHub deploy (recommended)
-1. Push this repo to GitHub
-2. In Railway, click **New Project → Deploy from GitHub repo**
-3. Select this repo
-4. Railway auto-detects the `Procfile` and deploys
+## Deploy on Railway
 
-### Option B: Manual upload
-1. Zip the `gateway/` folder (only `package.json`, `index.js`, `Procfile`)
-2. In Railway, click **New Project → Upload**
-3. Upload the zip
+1. Push this `gateway/` folder to a GitHub repo (or zip + upload).
+2. Railway → **New Project** → **Deploy from GitHub repo**.
+3. Add these environment variables (Service → Variables):
 
----
+   | Name | Value |
+   |---|---|
+   | `DISCORD_BOT_TOKEN` | From Discord Dev Portal → Bot → Reset Token |
+   | `SUPABASE_URL` | Your Lovable Cloud project URL |
+   | `SUPABASE_SERVICE_ROLE_KEY` | From Lovable Cloud → backend secrets |
+   | `WEBSITE_URL` | `https://discord-pvp-hub.lovable.app` (optional, defaults to this) |
 
-## 2. Add environment variables
+4. Deploy. Within a few seconds the bot will show **Online** in your server.
 
-In Railway, go to **Variables** and add:
+## Required Discord intents
 
-| Variable | Value | Where to find it |
-|----------|-------|-----------------|
-| `DISCORD_BOT_TOKEN` | Your bot token | Discord Developer Portal → Bot → Reset Token |
+In Discord Dev Portal → **Bot** → enable:
+- **Server Members Intent** (for welcomes)
+- **Message Content Intent** (for chat gate + XP)
 
-**Important:** Use the same bot token that your Lovable app uses.
+Without these, the bot will boot but won't react to messages or joins.
 
----
+## Required bot permissions
 
-## 3. Deploy
-
-Railway will auto-deploy. Once the deploy is live, your bot will show **Online** in Discord.
-
-Check the **Deploy Logs** in Railway to confirm: `Bot online as [YourBot#1234]`
-
----
-
-## How it works
-
-- This bot only opens a **WebSocket gateway connection** to Discord (required for "Online" status)
-- Slash commands are still handled by your Lovable app at `/api/public/discord/interactions`
-- This gateway does **not** process commands, so there are no duplicates
-
----
-
-## Troubleshooting
-
-**Bot still offline?**
-- Check Railway logs for errors
-- Verify `DISCORD_BOT_TOKEN` is correct (not the OAuth secret, but the Bot token)
-- Make sure the bot is in your Discord server
-
-**Want to stop it?**
-- Just delete the Railway project — your Lovable slash commands will still work, but the bot won't show "Online"
+Re-invite the bot with these permissions if it can't delete messages:
+`Send Messages`, `Manage Messages`, `Read Message History`, `View Channels`.

@@ -58,6 +58,18 @@ export const Route = createFileRoute("/api/public/discord/interactions")({
                 minecraft_username: opts.player, gamemode_id: gm.id, tier: opts.tier as any, region: finalRegion as any, awarded_by: profile.id,
               }, { onConflict: "minecraft_username,gamemode_id" });
               if (error) return reply(`❌ ${error.message}`, true);
+
+              // Announce in tier-announcements channel (fire-and-forget)
+              const ANNOUNCE_CHANNEL = "1517732611865444372";
+              const botToken = process.env.DISCORD_BOT_TOKEN;
+              if (botToken) {
+                const content = `🏆 **${opts.player}** has been awarded **${opts.tier}** in ${gm.name} (${finalRegion})\n${origin}/player/${encodeURIComponent(opts.player)}`;
+                fetch(`https://discord.com/api/v10/channels/${ANNOUNCE_CHANNEL}/messages`, {
+                  method: "POST",
+                  headers: { Authorization: `Bot ${botToken}`, "Content-Type": "application/json" },
+                  body: JSON.stringify({ content }),
+                }).catch(e => console.error("[announce]", e));
+              }
               return reply(`✅ Set **${opts.player}** to **${opts.tier}** in ${gm.name}`);
             }
 
