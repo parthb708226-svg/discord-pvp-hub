@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
-import { mcFullBody, TIER_BG, type TierRank } from "@/lib/minecraft";
+import { TIER_BG, type TierRank } from "@/lib/minecraft";
+import { SkinViewer } from "@/components/skin-viewer";
 
 export const Route = createFileRoute("/player/$username")({
   head: ({ params }) => ({
@@ -37,8 +38,9 @@ function PlayerPage() {
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="grid md:grid-cols-[260px_1fr] gap-8 items-start">
           <Card className="p-6 flex flex-col items-center pixel-border">
-            <img src={mcFullBody(username)} alt={username} className="h-64 object-contain" />
+            <SkinViewer username={username} width={220} height={340} />
             <h1 className="mt-4 text-2xl font-extrabold text-center break-all">{username}</h1>
+            <p className="text-[10px] text-muted-foreground">Drag to rotate</p>
             <a href={`https://namemc.com/profile/${username}`} target="_blank" rel="noopener" className="mt-1 text-xs text-muted-foreground hover:text-primary">View on NameMC →</a>
           </Card>
           <div>

@@ -1,16 +1,13 @@
 {
-  "name": "discord-pvp-hub-gateway",
+  "name": "pvp-tiers-gateway",
   "version": "1.0.0",
-  "description": "Discord gateway bot to keep the PvP Hub bot online",
-  "main": "index.js",
+  "private": true,
   "type": "module",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "discord.js": "^14.15.3"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "discord.js": "14.15.3",
+    "@supabase/supabase-js": "2.45.4"
   }
 }
