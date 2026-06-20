@@ -37,10 +37,9 @@ function BotConfig() {
         <p className="text-sm text-muted-foreground">Click below to register / re-register all commands in your Discord server. Idempotent — safe to run anytime.</p>
         <Button onClick={() => mut.mutate()} disabled={mut.isPending}>{mut.isPending ? "Registering..." : "Register slash commands"}</Button>
         <ul className="text-xs text-muted-foreground list-disc pl-5 space-y-1">
-          <li><code>/tier player gamemode</code> — look up a player's tier</li>
-          <li><code>/settier player gamemode tier [region]</code> — testers only</li>
-          <li><code>/tierlist gamemode</code> — share the tier list link</li>
-          <li><code>/profile player</code> — show all tiers for a player</li>
+          <li><code>/tier</code> · <code>/settier</code> · <code>/tierlist</code> · <code>/profile</code></li>
+          <li><strong>Moderation (admin):</strong> <code>/warn</code> · <code>/warnings</code> · <code>/mute</code> · <code>/unmute</code> · <code>/kick</code> · <code>/ban</code> · <code>/unban</code></li>
+          <li>All mod actions are logged in channel <code>1517734779699724458</code>.</li>
         </ul>
       </Card>
 
