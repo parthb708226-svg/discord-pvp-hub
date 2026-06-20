@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { mcHead, TIER_BG, type TierRank, TIER_ORDER } from "@/lib/minecraft";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { SkinViewer } from "@/components/skin-viewer";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({ meta: [{ title: "Leaderboard — PvP Tiers" }] }),
@@ -42,18 +44,26 @@ function Leaderboard() {
         <p className="text-muted-foreground mb-8">Ranked by total tier score across all gamemodes.</p>
         <Card className="divide-y divide-border pixel-border">
           {data?.map((p, i) => (
-            <Link key={p.username} to="/player/$username" params={{ username: p.username }}
-              className="flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors">
-              <div className="w-8 text-center text-lg font-bold text-muted-foreground">{i + 1}</div>
-              <img src={mcHead(p.username, 40)} alt="" className="h-10 w-10 rounded" />
-              <div className="flex-1 font-semibold">{p.username}</div>
-              <div className="flex flex-wrap gap-1 max-w-[60%] justify-end">
-                {p.tiers.map((t, idx) => (
-                  <span key={idx} className={`px-2 py-0.5 text-[10px] font-bold rounded ${TIER_BG[t as TierRank]}`}>{t}</span>
-                ))}
-              </div>
-              <div className="w-12 text-right font-mono text-sm text-primary font-bold">{p.score}</div>
-            </Link>
+            <HoverCard key={p.username} openDelay={150} closeDelay={80}>
+              <HoverCardTrigger asChild>
+                <Link to="/player/$username" params={{ username: p.username }}
+                  className="flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors">
+                  <div className="w-8 text-center text-lg font-bold text-muted-foreground">{i + 1}</div>
+                  <img src={mcHead(p.username, 40)} alt="" className="h-10 w-10 rounded" />
+                  <div className="flex-1 font-semibold">{p.username}</div>
+                  <div className="flex flex-wrap gap-1 max-w-[60%] justify-end">
+                    {p.tiers.map((t, idx) => (
+                      <span key={idx} className={`px-2 py-0.5 text-[10px] font-bold rounded ${TIER_BG[t as TierRank]}`}>{t}</span>
+                    ))}
+                  </div>
+                  <div className="w-12 text-right font-mono text-sm text-primary font-bold">{p.score}</div>
+                </Link>
+              </HoverCardTrigger>
+              <HoverCardContent side="left" className="w-auto p-2 bg-card pixel-border">
+                <SkinViewer username={p.username} width={160} height={240} staticView />
+                <p className="mt-1 text-center text-xs font-bold">{p.username}</p>
+              </HoverCardContent>
+            </HoverCard>
           ))}
           {data?.length === 0 && <div className="p-12 text-center text-muted-foreground">No players ranked yet.</div>}
         </Card>
