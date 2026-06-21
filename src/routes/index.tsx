@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { Swords } from "lucide-react";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,9 +61,9 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {gamemodes?.map(g => (
             <Link key={g.id} to="/tier/$slug" params={{ slug: g.slug }} className="group">
-              <Card className="p-6 hover:border-primary/60 hover:bg-card/80 transition-all pixel-border">
-                <div className="text-4xl">{g.icon}</div>
-                <div className="mt-3 font-bold text-lg">{g.name}</div>
+              <Card className="p-6 dirt-panel pixel-border-deep enchant-hover hover:translate-y-[-2px] transition-transform">
+                <McIcon slug={g.slug} fallback={g.icon ?? "?"} size={56} />
+                <div className="mt-3 font-bold text-lg pixel-text text-sm">{g.name}</div>
                 <div className="mt-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">View tier list →</div>
               </Card>
             </Link>

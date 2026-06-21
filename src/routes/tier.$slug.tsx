@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { TIER_ORDER, TIER_LABEL, TIER_BG, mcHead, type TierRank } from "@/lib/minecraft";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/tier/$slug")({
   head: ({ params }) => ({
@@ -54,7 +55,7 @@ function TierPage() {
       <SiteHeader />
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-center gap-4 mb-10">
-          <div className="text-5xl">{gm?.icon}</div>
+          <McIcon slug={gm?.slug} fallback={gm?.icon ?? "?"} size={72} />
           <div>
             <h1 className="text-4xl font-extrabold">{gm?.name} <span className="text-muted-foreground font-normal">tier list</span></h1>
             <p className="text-sm text-muted-foreground mt-1">{tiers?.length ?? 0} ranked players</p>

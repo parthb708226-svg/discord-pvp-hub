@@ -1,44 +1,43 @@
-# PvP Tiers Gateway Bot
+# PvP Tiers — Discord Gateway Bot
 
-Keeps the bot **Online** and handles realtime events (welcome, chat levels, chat gate).
-Slash commands still go through the Lovable website — this gateway only handles things
-that need a persistent WebSocket connection.
+Tiny Node service that keeps the bot **Online**, handles welcomes, the
+"must log in before chat" rule, and chat-level XP.
 
-## Features
+Slash commands (`/tier`, `/settier`, `/warn`, `/ban`, …) are handled by the
+website's interactions endpoint — they work even when this process is offline.
 
-- ✅ Shows the bot as **Online** with "Watching PvP Tiers" status
-- 👋 Welcomes new members in channel `1517732915201577070`
-- 🔒 **Chat gate** — deletes messages from users who haven't logged into the website,
-  DMs them a link to sign in
-- 🎉 **Chat levels** — earn 15-25 XP per message (60s cooldown), DM on level up.
-  Stored in the `user_levels` table.
-- 🏆 Tier announcements in `1517732611865444372` are posted by the website itself
-  when `/settier` runs — no action needed here.
+## Why this exists
 
-## Deploy on Railway
+Discord's interactions endpoint only fires on slash commands. Persistent
+events (member joins, every message in chat) require a real WebSocket
+connection, which is what this gateway provides.
 
-1. Push this `gateway/` folder to a GitHub repo (or zip + upload).
-2. Railway → **New Project** → **Deploy from GitHub repo**.
-3. Add these environment variables (Service → Variables):
+## Architecture (no service-role key needed)
 
-   | Name | Value |
-   |---|---|
-   | `DISCORD_BOT_TOKEN` | From Discord Dev Portal → Bot → Reset Token |
-   | `SUPABASE_URL` | Your Lovable Cloud project URL |
-   | `SUPABASE_SERVICE_ROLE_KEY` | From Lovable Cloud → backend secrets |
-   | `WEBSITE_URL` | `https://discord-pvp-hub.lovable.app` (optional, defaults to this) |
+```
+Discord ─ws─► gateway ─signed HTTPS─► website /api/public/gateway/event ─► Supabase (admin)
+```
 
-4. Deploy. Within a few seconds the bot will show **Online** in your server.
+The bot only knows its Discord token and a shared HMAC secret. The website
+holds the service-role key and performs the privileged DB writes after
+verifying the HMAC signature.
 
-## Required Discord intents
+## Deploy to Railway
 
-In Discord Dev Portal → **Bot** → enable:
-- **Server Members Intent** (for welcomes)
-- **Message Content Intent** (for chat gate + XP)
+1. **Push** the `gateway/` folder to a GitHub repo (or use Railway's "deploy
+   from local").
+2. **New project → Deploy from repo**, set root directory = `gateway/`.
+3. **Variables** tab — add exactly these three:
+   - `DISCORD_BOT_TOKEN` — from Discord Developer Portal → Bot → Reset Token
+   - `GATEWAY_WEBHOOK_SECRET` — must equal the same secret set on the website
+     (already added: `GATEWAY_WEBHOOK_SECRET`)
+   - *(optional)* `GATEWAY_WEBHOOK_URL` — defaults to
+     `https://discord-pvp-hub.lovable.app/api/public/gateway/event`
+4. **Discord Developer Portal → your app → Bot → Privileged Gateway Intents**:
+   - ☑ Server Members Intent
+   - ☑ Message Content Intent
+5. **Bot permissions** in the server: Manage Messages (to delete unlinked
+   chat), View Channels, Send Messages, Read Message History.
+6. Railway auto-runs `npm start`. Tail logs to confirm `✅ Logged in as …`.
 
-Without these, the bot will boot but won't react to messages or joins.
-
-## Required bot permissions
-
-Re-invite the bot with these permissions if it can't delete messages:
-`Send Messages`, `Manage Messages`, `Read Message History`, `View Channels`.
+That's it — no Supabase keys in Railway.

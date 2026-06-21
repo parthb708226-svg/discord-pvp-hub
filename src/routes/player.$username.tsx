@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { TIER_BG, type TierRank } from "@/lib/minecraft";
 import { SkinViewer } from "@/components/skin-viewer";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/player/$username")({
   head: ({ params }) => ({
@@ -52,7 +53,7 @@ function PlayerPage() {
                   return (
                     <Link key={t.id} to="/tier/$slug" params={{ slug: gm?.slug ?? "" }}>
                       <Card className="p-4 hover:border-primary/60 transition-colors flex items-center gap-4">
-                        <div className="text-3xl">{gm?.icon}</div>
+                        <McIcon slug={gm?.slug} fallback={gm?.icon ?? "?"} size={40} />
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold truncate">{gm?.name}</div>
                           <div className="text-xs text-muted-foreground">{t.region} · {new Date(t.awarded_at).toLocaleDateString()}</div>

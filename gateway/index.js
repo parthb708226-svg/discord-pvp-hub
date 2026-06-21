@@ -1,29 +1,26 @@
-// Discord gateway bot — keeps the bot Online, handles welcomes, chat levels,
-// and the "must be logged into the website before chatting" rule.
-// All slash commands still route through the Lovable app /api/public/discord/interactions endpoint.
+// Discord gateway bot — keeps the bot Online, handles welcomes, chat gate, and chat-level XP.
+// Slash commands route through the website's interactions endpoint.
+// DB writes (XP, level lookups, profile checks) go through a signed webhook on the website,
+// so this process does NOT need the Supabase service-role key.
 
 import { Client, GatewayIntentBits, Events, Partials, ActivityType } from "discord.js";
-import { createClient } from "@supabase/supabase-js";
+import { createHmac } from "node:crypto";
 
 const {
   DISCORD_BOT_TOKEN,
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
+  GATEWAY_WEBHOOK_URL = "https://discord-pvp-hub.lovable.app/api/public/gateway/event",
+  GATEWAY_WEBHOOK_SECRET,
   WEBSITE_URL = "https://discord-pvp-hub.lovable.app",
 } = process.env;
 
 if (!DISCORD_BOT_TOKEN) throw new Error("Missing DISCORD_BOT_TOKEN");
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
+if (!GATEWAY_WEBHOOK_SECRET) throw new Error("Missing GATEWAY_WEBHOOK_SECRET (must match the website's value)");
 
 const WELCOME_CHANNEL_ID = "1517732915201577070";
-// Channels exempt from the "must log in" rule (announcements, rules, etc.). Add IDs as needed.
 const CHAT_GATE_EXEMPT_CHANNELS = new Set([
   "1517732611865444372", // tier announcements
+  "1517734779699724458", // mod-log
 ]);
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
 
 const client = new Client({
   intents: [
@@ -41,6 +38,19 @@ client.once(Events.ClientReady, c => {
   c.user.setPresence({ activities: [{ name: "PvP Tiers", type: ActivityType.Watching }], status: "online" });
 });
 
+// ---------- Signed webhook helper ----------
+async function callWebhook(action, payload) {
+  const body = JSON.stringify({ action, payload, ts: Date.now() });
+  const sig = createHmac("sha256", GATEWAY_WEBHOOK_SECRET).update(body).digest("hex");
+  const res = await fetch(GATEWAY_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-gateway-signature": sig },
+    body,
+  });
+  if (!res.ok) throw new Error(`webhook ${action} ${res.status}: ${await res.text().catch(() => "")}`);
+  return res.json();
+}
+
 // ---------- Welcome ----------
 client.on(Events.GuildMemberAdd, async member => {
   try {
@@ -54,58 +64,20 @@ client.on(Events.GuildMemberAdd, async member => {
   } catch (e) { console.error("[welcome]", e); }
 });
 
-// ---------- Helpers ----------
-async function isLinked(discordId) {
-  const { data } = await supabase.from("profiles").select("id").eq("discord_id", discordId).maybeSingle();
-  return !!data;
-}
-
-// XP required to reach a given level (classic curve)
-const xpForLevel = lvl => 5 * lvl * lvl + 50 * lvl + 100;
-
-// 1 message per 60s gives XP
-const xpCooldown = new Map(); // discord_id -> timestamp
-
-async function awardXp(message) {
-  const uid = message.author.id;
-  const now = Date.now();
-  const last = xpCooldown.get(uid) ?? 0;
-  if (now - last < 60_000) return;
-  xpCooldown.set(uid, now);
-
-  const gain = Math.floor(15 + Math.random() * 11); // 15-25 xp
-
-  const { data: row } = await supabase.from("user_levels").select("xp, level").eq("discord_id", uid).maybeSingle();
-  let xp = (row?.xp ?? 0) + gain;
-  let level = row?.level ?? 0;
-  let leveledUp = false;
-  while (xp >= xpForLevel(level)) {
-    xp -= xpForLevel(level);
-    level += 1;
-    leveledUp = true;
-  }
-
-  await supabase.from("user_levels").upsert({
-    discord_id: uid,
-    discord_username: message.author.username,
-    xp, level,
-    last_message_at: new Date().toISOString(),
-  }, { onConflict: "discord_id" });
-
-  if (leveledUp) {
-    try {
-      const dm = await message.author.createDM();
-      await dm.send(`🎉 You leveled up to **Level ${level}** on **${message.guild?.name ?? "the server"}**! Keep chatting to earn more XP.`);
-    } catch { /* DMs closed */ }
-  }
-}
-
 // ---------- Chat gate + XP ----------
+const xpCooldown = new Map(); // discord_id -> ms
+
 client.on(Events.MessageCreate, async message => {
   if (message.author.bot || !message.guild) return;
   if (CHAT_GATE_EXEMPT_CHANNELS.has(message.channelId)) return;
 
-  const linked = await isLinked(message.author.id);
+  // 1) Gate: is this user linked on the website?
+  let linked = false;
+  try {
+    const r = await callWebhook("check_linked", { discord_id: message.author.id });
+    linked = r.linked;
+  } catch (e) { console.error("[gate]", e); return; }
+
   if (!linked) {
     try { await message.delete(); } catch { /* missing perms */ }
     try {
@@ -119,7 +91,26 @@ client.on(Events.MessageCreate, async message => {
     return;
   }
 
-  awardXp(message).catch(e => console.error("[xp]", e));
+  // 2) XP: 1 message per 60s gives 15-25 xp
+  const now = Date.now();
+  const last = xpCooldown.get(message.author.id) ?? 0;
+  if (now - last < 60_000) return;
+  xpCooldown.set(message.author.id, now);
+  const gain = Math.floor(15 + Math.random() * 11);
+
+  try {
+    const r = await callWebhook("award_xp", {
+      discord_id: message.author.id,
+      discord_username: message.author.username,
+      gain,
+    });
+    if (r.leveled_up) {
+      try {
+        const dm = await message.author.createDM();
+        await dm.send(`🎉 You leveled up to **Level ${r.level}** on **${message.guild?.name ?? "the server"}**! Keep chatting to earn more XP.`);
+      } catch { /* DMs closed */ }
+    }
+  } catch (e) { console.error("[xp]", e); }
 });
 
 client.on(Events.Error, e => console.error("[gateway error]", e));
