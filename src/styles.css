@@ -91,7 +91,7 @@
   body {
     background-image:
       linear-gradient(rgba(10, 8, 16, 0.82), rgba(10, 8, 16, 0.92)),
-      url("/src/assets/textures/stone.jpg");
+      url("./assets/textures/stone.jpg");
     background-size: auto, 256px 256px;
     background-attachment: fixed;
     image-rendering: pixelated;
@@ -130,14 +130,14 @@
   .dirt-panel {
     background-image:
       linear-gradient(rgba(40, 20, 10, 0.55), rgba(40, 20, 10, 0.55)),
-      url("/src/assets/textures/dirt.jpg");
+      url("./assets/textures/dirt.jpg");
     background-size: 128px 128px;
     image-rendering: pixelated;
   }
   .stone-panel {
     background-image:
       linear-gradient(rgba(15, 15, 22, 0.7), rgba(15, 15, 22, 0.75)),
-      url("/src/assets/textures/stone.jpg");
+      url("./assets/textures/stone.jpg");
     background-size: 128px 128px;
     image-rendering: pixelated;
   }
