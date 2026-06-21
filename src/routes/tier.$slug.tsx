@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { TIER_ORDER, TIER_LABEL, TIER_BG, mcHead, type TierRank } from "@/lib/minecraft";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/tier/$slug")({
   head: ({ params }) => ({

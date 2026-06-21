@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { TIER_BG, type TierRank } from "@/lib/minecraft";
 import { SkinViewer } from "@/components/skin-viewer";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/player/$username")({
   head: ({ params }) => ({
