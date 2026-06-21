@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { Swords } from "lucide-react";
+import { McIcon } from "@/components/mc-icon";
 
 export const Route = createFileRoute("/")({
   head: () => ({
