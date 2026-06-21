@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminTiersRouteImport } from './routes/_authenticated/admin.tiers'
 import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
 import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
+import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
 import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/public/discord/interactions'
 import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
 import { Route as ApiAuthDiscordCallbackRouteImport } from './routes/api/auth/discord/callback'
@@ -85,6 +86,11 @@ const AuthenticatedAdminBotRoute = AuthenticatedAdminBotRouteImport.update({
   path: '/bot',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicGatewayEventRoute = ApiPublicGatewayEventRouteImport.update({
+  id: '/api/public/gateway/event',
+  path: '/api/public/gateway/event',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDiscordInteractionsRoute =
   ApiPublicDiscordInteractionsRouteImport.update({
     id: '/api/public/discord/interactions',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
+  '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
+  '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
+  '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
     | '/api/public/discord/interactions'
+    | '/api/public/gateway/event'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
     | '/api/public/discord/interactions'
+    | '/api/public/gateway/event'
   id:
     | '__root__'
     | '/'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
     | '/api/public/discord/interactions'
+    | '/api/public/gateway/event'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
   ApiAuthDiscordStartRoute: typeof ApiAuthDiscordStartRoute
   ApiPublicDiscordInteractionsRoute: typeof ApiPublicDiscordInteractionsRoute
+  ApiPublicGatewayEventRoute: typeof ApiPublicGatewayEventRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -300,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBotRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/gateway/event': {
+      id: '/api/public/gateway/event'
+      path: '/api/public/gateway/event'
+      fullPath: '/api/public/gateway/event'
+      preLoaderRoute: typeof ApiPublicGatewayEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/discord/interactions': {
       id: '/api/public/discord/interactions'
       path: '/api/public/discord/interactions'
@@ -364,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
   ApiAuthDiscordStartRoute: ApiAuthDiscordStartRoute,
   ApiPublicDiscordInteractionsRoute: ApiPublicDiscordInteractionsRoute,
+  ApiPublicGatewayEventRoute: ApiPublicGatewayEventRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
