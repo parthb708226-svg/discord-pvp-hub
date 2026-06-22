@@ -28,9 +28,9 @@ function BotConfig() {
   const listActs = useServerFn(listModActionsFn);
   const testFn = useServerFn(testAnnounceFn);
 
-  const { data: cfg } = useQuery({ queryKey: ["bot_config"], queryFn: () => getCfg({}) });
-  const { data: channels } = useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans({}) });
-  const { data: actions } = useQuery({ queryKey: ["mod_actions"], queryFn: () => listActs({}) });
+  const { data: cfg } = useQuery({ queryKey: ["bot_config"], queryFn: () => getCfg() });
+  const { data: channels } = useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans() });
+  const { data: actions } = useQuery({ queryKey: ["mod_actions"], queryFn: () => listActs() });
 
   const [draft, setDraft] = useState<any>(null);
   useEffect(() => { if (cfg && !draft) setDraft(cfg); }, [cfg]);
