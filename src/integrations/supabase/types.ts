@@ -52,6 +52,45 @@ export type Database = {
           },
         ]
       }
+      bot_config: {
+        Row: {
+          chat_gate_enabled: boolean
+          gamemode_log_channel_id: string | null
+          id: string
+          mod_log_channel_id: string | null
+          tier_announce_channel_id: string | null
+          tier_announcements_enabled: boolean
+          updated_at: string
+          welcome_channel_id: string | null
+          welcome_message: string
+          welcomer_enabled: boolean
+        }
+        Insert: {
+          chat_gate_enabled?: boolean
+          gamemode_log_channel_id?: string | null
+          id?: string
+          mod_log_channel_id?: string | null
+          tier_announce_channel_id?: string | null
+          tier_announcements_enabled?: boolean
+          updated_at?: string
+          welcome_channel_id?: string | null
+          welcome_message?: string
+          welcomer_enabled?: boolean
+        }
+        Update: {
+          chat_gate_enabled?: boolean
+          gamemode_log_channel_id?: string | null
+          id?: string
+          mod_log_channel_id?: string | null
+          tier_announce_channel_id?: string | null
+          tier_announcements_enabled?: boolean
+          updated_at?: string
+          welcome_channel_id?: string | null
+          welcome_message?: string
+          welcomer_enabled?: boolean
+        }
+        Relationships: []
+      }
       gamemodes: {
         Row: {
           active: boolean
@@ -79,6 +118,42 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      mod_actions: {
+        Row: {
+          action: string
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          moderator_discord_id: string
+          moderator_username: string | null
+          reason: string | null
+          target_discord_id: string
+          target_username: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          moderator_discord_id: string
+          moderator_username?: string | null
+          reason?: string | null
+          target_discord_id: string
+          target_username?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          moderator_discord_id?: string
+          moderator_username?: string | null
+          reason?: string | null
+          target_discord_id?: string
+          target_username?: string | null
         }
         Relationships: []
       }
