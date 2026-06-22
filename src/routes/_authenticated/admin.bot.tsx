@@ -1,52 +1,215 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { registerBotCommands } from "@/lib/bot.functions";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  registerBotCommands, getBotConfigFn, updateBotConfigFn,
+  listChannelsFn, listModActionsFn, testAnnounceFn,
+} from "@/lib/bot.functions";
 import { toast } from "sonner";
 import { Copy, Check } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/bot")({ component: BotConfig });
 
 function BotConfig() {
+  const qc = useQueryClient();
   const register = useServerFn(registerBotCommands);
-  const mut = useMutation({
+  const getCfg = useServerFn(getBotConfigFn);
+  const updateCfg = useServerFn(updateBotConfigFn);
+  const listChans = useServerFn(listChannelsFn);
+  const listActs = useServerFn(listModActionsFn);
+  const testFn = useServerFn(testAnnounceFn);
+
+  const { data: cfg } = useQuery({ queryKey: ["bot_config"], queryFn: () => getCfg({}) });
+  const { data: channels } = useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans({}) });
+  const { data: actions } = useQuery({ queryKey: ["mod_actions"], queryFn: () => listActs({}) });
+
+  const [draft, setDraft] = useState<any>(null);
+  useEffect(() => { if (cfg && !draft) setDraft(cfg); }, [cfg]);
+
+  const save = useMutation({
+    mutationFn: (patch: any) => updateCfg({ data: patch }),
+    onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["bot_config"] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reg = useMutation({
     mutationFn: () => register({} as any),
     onSuccess: (d) => toast.success(`Registered ${d.count} commands`),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const test = useMutation({
+    mutationFn: (kind: "welcome" | "tier" | "mod") => testFn({ data: { kind } }),
+    onSuccess: () => toast.success("Sent — check Discord"),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
   const interactionsUrl = `${origin}/api/public/discord/interactions`;
 
+  if (!draft) return <div className="text-sm text-muted-foreground">Loading…</div>;
+
+  const channelOptions = (channels ?? []).map(c => ({ id: c.id, name: `# ${c.name}` }));
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-extrabold">Discord bot</h1>
+      <h1 className="text-3xl font-extrabold">Discord Bot</h1>
 
-      <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">1. Set the Interactions Endpoint URL</h2>
-        <p className="text-sm text-muted-foreground">In the Discord Developer Portal → your app → <strong>General Information</strong>, set this as the Interactions Endpoint URL:</p>
-        <Copyable value={interactionsUrl} />
-        <p className="text-xs text-muted-foreground">Discord will ping the URL to verify your public key. You must save commands first or it will fail to handshake — but the endpoint here always responds correctly.</p>
-      </Card>
+      <Tabs defaultValue="channels">
+        <TabsList>
+          <TabsTrigger value="channels">Channels & Toggles</TabsTrigger>
+          <TabsTrigger value="welcome">Welcomer</TabsTrigger>
+          <TabsTrigger value="commands">Commands</TabsTrigger>
+          <TabsTrigger value="modlog">Mod Log</TabsTrigger>
+          <TabsTrigger value="setup">Setup</TabsTrigger>
+        </TabsList>
 
-      <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">2. Register slash commands</h2>
-        <p className="text-sm text-muted-foreground">Click below to register / re-register all commands in your Discord server. Idempotent — safe to run anytime.</p>
-        <Button onClick={() => mut.mutate()} disabled={mut.isPending}>{mut.isPending ? "Registering..." : "Register slash commands"}</Button>
-        <ul className="text-xs text-muted-foreground list-disc pl-5 space-y-1">
-          <li><code>/tier</code> · <code>/settier</code> · <code>/tierlist</code> · <code>/profile</code></li>
-          <li><strong>Moderation (admin):</strong> <code>/warn</code> · <code>/warnings</code> · <code>/mute</code> · <code>/unmute</code> · <code>/kick</code> · <code>/ban</code> · <code>/unban</code></li>
-          <li>All mod actions are logged in channel <code>1517734779699724458</code>.</li>
-        </ul>
-      </Card>
+        {/* ===== Channels ===== */}
+        <TabsContent value="channels" className="space-y-4">
+          <Card className="p-6 space-y-4">
+            <h2 className="font-bold text-lg">Channel routing</h2>
+            <p className="text-sm text-muted-foreground">Where the bot sends each kind of message. Pick a channel from your server.</p>
 
-      <Card className="p-6 space-y-3">
-        <h2 className="font-bold text-lg">3. Invite the bot to your server</h2>
-        <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands`} />
-      </Card>
+            <ChannelField label="Welcome channel" value={draft.welcome_channel_id} options={channelOptions}
+              onChange={v => setDraft({ ...draft, welcome_channel_id: v })} />
+            <ChannelField label="Tier announcements" value={draft.tier_announce_channel_id} options={channelOptions}
+              onChange={v => setDraft({ ...draft, tier_announce_channel_id: v })} />
+            <ChannelField label="Moderation log" value={draft.mod_log_channel_id} options={channelOptions}
+              onChange={v => setDraft({ ...draft, mod_log_channel_id: v })} />
+            <ChannelField label="Gamemode change log (optional)" value={draft.gamemode_log_channel_id} options={channelOptions}
+              onChange={v => setDraft({ ...draft, gamemode_log_channel_id: v })} />
+
+            <div className="grid sm:grid-cols-3 gap-4 pt-2">
+              <ToggleRow label="Tier announcements" checked={!!draft.tier_announcements_enabled} onChange={v => setDraft({ ...draft, tier_announcements_enabled: v })} />
+              <ToggleRow label="Welcomer" checked={!!draft.welcomer_enabled} onChange={v => setDraft({ ...draft, welcomer_enabled: v })} />
+              <ToggleRow label="Chat link-gate" checked={!!draft.chat_gate_enabled} onChange={v => setDraft({ ...draft, chat_gate_enabled: v })} />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button onClick={() => save.mutate(draft)} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save changes"}</Button>
+              <Button variant="outline" onClick={() => test.mutate("tier")} disabled={test.isPending}>Send test tier announcement</Button>
+              <Button variant="outline" onClick={() => test.mutate("mod")} disabled={test.isPending}>Send test mod log</Button>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* ===== Welcomer ===== */}
+        <TabsContent value="welcome" className="space-y-4">
+          <Card className="p-6 space-y-4">
+            <h2 className="font-bold text-lg">Welcome message</h2>
+            <p className="text-sm text-muted-foreground">
+              Use placeholders: <code>{"{user}"}</code> (mention), <code>{"{guild}"}</code> (server name), <code>{"{website}"}</code>.
+              A rich embed is added automatically with a "Link account" link and command hints.
+            </p>
+            <Textarea rows={6} value={draft.welcome_message ?? ""} onChange={e => setDraft({ ...draft, welcome_message: e.target.value })} />
+            <div className="flex gap-2">
+              <Button onClick={() => save.mutate({ welcome_message: draft.welcome_message })} disabled={save.isPending}>Save welcome message</Button>
+              <Button variant="outline" onClick={() => test.mutate("welcome")} disabled={test.isPending}>Send test welcome</Button>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* ===== Commands ===== */}
+        <TabsContent value="commands" className="space-y-4">
+          <Card className="p-6 space-y-3">
+            <h2 className="font-bold text-lg">Slash commands</h2>
+            <p className="text-sm text-muted-foreground">Re-register every time you add or change a command in the bot code.</p>
+            <Button onClick={() => reg.mutate()} disabled={reg.isPending}>{reg.isPending ? "Registering..." : "Register all slash commands"}</Button>
+            <div className="grid sm:grid-cols-2 gap-3 text-xs text-muted-foreground pt-2">
+              <div>
+                <div className="font-bold text-foreground mb-1">Public</div>
+                <code>/tier</code> · <code>/profile</code> · <code>/tierlist</code> · <code>/leaderboard</code> · <code>/compare</code> · <code>/recent</code> · <code>/gamemodes</code> · <code>/stats</code> · <code>/rank</code> · <code>/help</code>
+              </div>
+              <div>
+                <div className="font-bold text-foreground mb-1">Tester+</div>
+                <code>/settier</code> · <code>/removetier</code>
+                <div className="font-bold text-foreground mt-3 mb-1">Admin</div>
+                <code>/warn</code> · <code>/warnings</code> · <code>/clearwarnings</code> · <code>/mute</code> · <code>/unmute</code> · <code>/kick</code> · <code>/ban</code> · <code>/unban</code> · <code>/purge</code> · <code>/say</code>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* ===== Mod Log ===== */}
+        <TabsContent value="modlog" className="space-y-4">
+          <Card className="p-6">
+            <h2 className="font-bold text-lg mb-3">Recent moderation actions</h2>
+            <div className="divide-y divide-border">
+              {(actions ?? []).map((a: any) => (
+                <div key={a.id} className="py-2 text-sm flex flex-wrap items-center gap-2">
+                  <span className="font-bold uppercase text-xs px-2 py-1 rounded bg-muted">{a.action}</span>
+                  <span>{a.target_username ?? a.target_discord_id}</span>
+                  <span className="text-muted-foreground">by {a.moderator_username ?? a.moderator_discord_id}</span>
+                  {a.duration_minutes ? <span className="text-muted-foreground">· {a.duration_minutes}m</span> : null}
+                  {a.reason ? <span className="text-muted-foreground italic">— {a.reason}</span> : null}
+                  <span className="ml-auto text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString()}</span>
+                </div>
+              ))}
+              {(!actions || actions.length === 0) && <div className="py-8 text-center text-sm text-muted-foreground">No moderation actions yet.</div>}
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* ===== Setup ===== */}
+        <TabsContent value="setup" className="space-y-4">
+          <Card className="p-6 space-y-3">
+            <h2 className="font-bold text-lg">1. Interactions Endpoint URL</h2>
+            <p className="text-sm text-muted-foreground">Paste this in the Discord Developer Portal → your app → General Information.</p>
+            <Copyable value={interactionsUrl} />
+          </Card>
+          <Card className="p-6 space-y-3">
+            <h2 className="font-bold text-lg">2. Invite the bot</h2>
+            <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands`} />
+          </Card>
+          <Card className="p-6 space-y-3">
+            <h2 className="font-bold text-lg">3. Gateway worker (welcome + chat-gate + XP)</h2>
+            <p className="text-sm text-muted-foreground">
+              The <code>gateway/</code> folder is a tiny Node app you deploy to Railway / Render / Fly / a VPS. It only needs two env vars:
+            </p>
+            <ul className="text-sm list-disc pl-5 space-y-1">
+              <li><code>DISCORD_BOT_TOKEN</code> — your bot token</li>
+              <li><code>GATEWAY_WEBHOOK_SECRET</code> — must match the value set on this project</li>
+            </ul>
+            <p className="text-sm text-muted-foreground">Then <code>npm install</code> and <code>npm start</code>. Welcomer text & channel are pulled from this page live.</p>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function ChannelField({ label, value, options, onChange }: { label: string; value: string | null | undefined; options: Array<{ id: string; name: string }>; onChange: (v: string | null) => void }) {
+  return (
+    <div className="grid sm:grid-cols-[200px_1fr_auto] gap-2 items-center">
+      <Label>{label}</Label>
+      <Select value={value ?? "__none"} onValueChange={v => onChange(v === "__none" ? null : v)}>
+        <SelectTrigger><SelectValue placeholder="Pick a channel" /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__none">— none —</SelectItem>
+          {options.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Input className="w-44 font-mono text-xs" placeholder="or paste ID"
+        value={value ?? ""} onChange={e => onChange(e.target.value || null)} />
+    </div>
+  );
+}
+
+function ToggleRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+      <span className="text-sm font-medium">{label}</span>
+      <Switch checked={checked} onCheckedChange={onChange} />
     </div>
   );
 }
