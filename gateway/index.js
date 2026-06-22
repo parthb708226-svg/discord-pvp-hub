@@ -16,7 +16,6 @@ const {
 if (!DISCORD_BOT_TOKEN) throw new Error("Missing DISCORD_BOT_TOKEN");
 if (!GATEWAY_WEBHOOK_SECRET) throw new Error("Missing GATEWAY_WEBHOOK_SECRET (must match the website's value)");
 
-const WELCOME_CHANNEL_ID = "1517732915201577070";
 const CHAT_GATE_EXEMPT_CHANNELS = new Set([
   "1517732611865444372", // tier announcements
   "1517734779699724458", // mod-log
@@ -51,16 +50,10 @@ async function callWebhook(action, payload) {
   return res.json();
 }
 
-// ---------- Welcome ----------
+// ---------- Welcome (delegated to website so it can use rich embeds + live config) ----------
 client.on(Events.GuildMemberAdd, async member => {
   try {
-    const channel = await member.guild.channels.fetch(WELCOME_CHANNEL_ID).catch(() => null);
-    if (!channel || !channel.isTextBased()) return;
-    await channel.send({
-      content: `👋 Welcome <@${member.id}> to **${member.guild.name}**!\n` +
-        `🔗 Link your account at ${WEBSITE_URL}/auth before you can chat.\n` +
-        `Use \`/tier\`, \`/profile\`, \`/tierlist\` to explore rankings.`,
-    });
+    await callWebhook("welcome", { user_id: member.id, guild_name: member.guild.name });
   } catch (e) { console.error("[welcome]", e); }
 });
 
