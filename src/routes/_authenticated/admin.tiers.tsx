@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TIER_ORDER, REGIONS, TIER_BG, mcHead, type TierRank } from "@/lib/minecraft";
+import { upsertTierFn, deleteTierFn } from "@/lib/bot.functions";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
@@ -34,24 +36,21 @@ function ManageTiers() {
     },
   });
 
+  const upsertFn = useServerFn(upsertTierFn);
+  const deleteFn = useServerFn(deleteTierFn);
+
   const upsert = useMutation({
     mutationFn: async () => {
       if (!username.trim() || !gamemodeId) throw new Error("Username and gamemode required");
-      const { error } = await supabase.from("player_tiers").upsert({
-        minecraft_username: username.trim(), gamemode_id: gamemodeId, tier, region: region as any,
-      }, { onConflict: "minecraft_username,gamemode_id" });
-      if (error) throw error;
+      await upsertFn({ data: { username: username.trim(), gamemode_id: gamemodeId, tier, region } });
     },
-    onSuccess: () => { toast.success("Tier saved"); setUsername(""); qc.invalidateQueries(); },
+    onSuccess: () => { toast.success("Tier saved & announced"); setUsername(""); qc.invalidateQueries(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("player_tiers").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Removed"); qc.invalidateQueries(); },
+    mutationFn: async (id: string) => { await deleteFn({ data: { id } }); },
+    onSuccess: () => { toast.success("Removed & announced"); qc.invalidateQueries(); },
     onError: (e: Error) => toast.error(e.message),
   });
 

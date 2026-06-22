@@ -27,6 +27,21 @@ export const Route = createFileRoute("/api/public/gateway/event")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         try {
+          if (action === "get_config") {
+            const { data } = await supabaseAdmin.from("bot_config").select("*").eq("id", "main").maybeSingle();
+            return Response.json({ config: data ?? null });
+          }
+
+          if (action === "welcome") {
+            const userId = String(payload.user_id ?? "");
+            const guildName = String(payload.guild_name ?? "the server");
+            if (!/^\d{5,32}$/.test(userId)) return new Response("bad id", { status: 400 });
+            const { sendWelcome } = await import("@/lib/discord-announce.server");
+            const origin = process.env.SITE_ORIGIN ?? "https://discord-pvp-hub.lovable.app";
+            await sendWelcome({ userId, guildName, websiteUrl: origin });
+            return Response.json({ ok: true });
+          }
+
           if (action === "check_linked") {
             const discordId = String(payload.discord_id ?? "");
             if (!/^\d{5,32}$/.test(discordId)) return Response.json({ linked: false });
