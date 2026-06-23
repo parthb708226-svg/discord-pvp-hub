@@ -216,7 +216,7 @@ export const testAnnounceFn = createServerFn({ method: "POST" })
   .inputValidator((d: { kind: "welcome" | "tier" | "mod" }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const origin = process.env.SITE_ORIGIN ?? "https://discord-pvp-hub.lovable.app";
+    const origin = process.env.SITE_ORIGIN ?? "https://archer-tier-list.lovable.app";
     const a = await import("@/lib/discord-announce.server");
     if (data.kind === "welcome") {
       const { data: prof } = await context.supabase.from("profiles").select("discord_id").eq("id", context.userId).maybeSingle();
