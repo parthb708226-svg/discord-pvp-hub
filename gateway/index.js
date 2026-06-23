@@ -8,9 +8,9 @@ import { createHmac } from "node:crypto";
 
 const {
   DISCORD_BOT_TOKEN,
-  GATEWAY_WEBHOOK_URL = "https://discord-pvp-hub.lovable.app/api/public/gateway/event",
+  GATEWAY_WEBHOOK_URL = "https://archer-tier-list.lovable.app/api/public/gateway/event",
   GATEWAY_WEBHOOK_SECRET,
-  WEBSITE_URL = "https://discord-pvp-hub.lovable.app",
+  WEBSITE_URL = "https://archer-tier-list.lovable.app",
 } = process.env;
 
 if (!DISCORD_BOT_TOKEN) throw new Error("Missing DISCORD_BOT_TOKEN");
