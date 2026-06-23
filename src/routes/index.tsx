@@ -9,8 +9,8 @@ import { McIcon } from "@/components/mc-icon";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PvP Tiers — Minecraft PvP Tier List" },
-      { name: "description", content: "Official Minecraft PvP tier rankings across Crystal, Sword, SMP, UHC, Pot, NethPot, Axe, Mace, Vanilla, and Bedwars." },
+      { title: "Archer's Tier List — Minecraft PvP Rankings" },
+      { name: "description", content: "Archer's Tier List — Minecraft PvP rankings across Crystal, Sword, SMP, UHC, Pot, NethPot, Axe, Mace, Vanilla, Bedwars, and Archer." },
     ],
   }),
   component: Home,
@@ -48,10 +48,10 @@ function Home() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> Live tier rankings
           </div>
           <h1 className="mt-5 text-5xl md:text-7xl font-extrabold leading-[1.05]">
-            The official <span className="text-primary">Minecraft PvP</span> tier list.
+            <span className="text-primary">Archer's</span> Tier List.
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-            Tested by the community. Crystal, Sword, SMP, UHC, Pot, NethPot, Axe, Mace, Vanilla, Bedwars — every player, every gamemode, one ranking.
+            Tested by the community. Crystal, Sword, SMP, UHC, Pot, NethPot, Axe, Mace, Vanilla, Bedwars, Archer — every player, every gamemode, one ranking.
           </p>
         </div>
       </section>
