@@ -17,8 +17,7 @@ if (!DISCORD_BOT_TOKEN) throw new Error("Missing DISCORD_BOT_TOKEN");
 if (!GATEWAY_WEBHOOK_SECRET) throw new Error("Missing GATEWAY_WEBHOOK_SECRET (must match the website's value)");
 
 const CHAT_GATE_EXEMPT_CHANNELS = new Set([
-  "1517732611865444372", // tier announcements
-  "1517734779699724458", // mod-log
+  "1513961894132846642", // tier announcements
 ]);
 
 const client = new Client({
