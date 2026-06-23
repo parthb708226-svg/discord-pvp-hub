@@ -90,9 +90,10 @@
   }
   body {
     background-image:
-      linear-gradient(rgba(10, 8, 16, 0.82), rgba(10, 8, 16, 0.92)),
-      url("./assets/textures/stone.jpg");
-    background-size: auto, 256px 256px;
+      linear-gradient(rgba(10, 8, 16, 0.78), rgba(10, 8, 16, 0.88)),
+      url("./assets/textures/deepslate.png");
+    background-size: auto, 64px 64px;
+    background-repeat: repeat;
     background-attachment: fixed;
     image-rendering: pixelated;
   }
