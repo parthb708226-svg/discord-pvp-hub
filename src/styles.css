@@ -90,9 +90,10 @@
   }
   body {
     background-image:
-      linear-gradient(rgba(10, 8, 16, 0.82), rgba(10, 8, 16, 0.92)),
-      url("./assets/textures/stone.jpg");
-    background-size: auto, 256px 256px;
+      linear-gradient(rgba(10, 8, 16, 0.78), rgba(10, 8, 16, 0.88)),
+      url("./assets/textures/deepslate.png");
+    background-size: auto, 64px 64px;
+    background-repeat: repeat;
     background-attachment: fixed;
     image-rendering: pixelated;
   }
@@ -129,16 +130,18 @@
   /* Dirt panel: brown tiled background */
   .dirt-panel {
     background-image:
-      linear-gradient(rgba(40, 20, 10, 0.55), rgba(40, 20, 10, 0.55)),
-      url("./assets/textures/dirt.jpg");
-    background-size: 128px 128px;
+      linear-gradient(rgba(40, 22, 12, 0.35), rgba(40, 22, 12, 0.45)),
+      url("./assets/textures/dirt.png");
+    background-size: 48px 48px;
+    background-repeat: repeat;
     image-rendering: pixelated;
   }
   .stone-panel {
     background-image:
-      linear-gradient(rgba(15, 15, 22, 0.7), rgba(15, 15, 22, 0.75)),
-      url("./assets/textures/stone.jpg");
-    background-size: 128px 128px;
+      linear-gradient(rgba(15, 15, 22, 0.45), rgba(15, 15, 22, 0.55)),
+      url("./assets/textures/stone.png");
+    background-size: 48px 48px;
+    background-repeat: repeat;
     image-rendering: pixelated;
   }
 
