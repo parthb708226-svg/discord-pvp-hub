@@ -12,7 +12,7 @@ export function SiteHeader() {
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground glow-primary">
             <Swords className="h-5 w-5" />
           </span>
-          <span>PvP<span className="text-primary">Tiers</span></span>
+          <span>Archer's<span className="text-primary">Tiers</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-1 text-sm">
           <Link to="/" className="px-3 py-2 rounded-md hover:bg-muted [&.active]:text-primary [&.active]:font-semibold" activeOptions={{ exact: true }}>Home</Link>
