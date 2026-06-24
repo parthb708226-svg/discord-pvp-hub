@@ -205,7 +205,7 @@ export const Route = createFileRoute("/api/public/discord/interactions")({
           }
 
           // ============== Moderation ==============
-          const isModCommand = ["warn","warnings","clearwarnings","mute","unmute","kick","ban","unban","purge","say"].includes(cmd);
+          const isModCommand = ["warn","warnings","clearwarnings","mute","unmute","kick","ban","unban","purge","say","slowmode","lock","unlock","addrole","removerole","createrole","deleterole","createchannel","deletechannel","renamechannel"].includes(cmd);
           if (!isModCommand) return reply("Unknown command.");
 
           const actorId = body.member?.user?.id ?? body.user?.id;
@@ -305,6 +305,69 @@ export const Route = createFileRoute("/api/public/discord/interactions")({
             const res = await discordApi(`/channels/${channelId}/messages`, { method: "POST", body: JSON.stringify({ content: opts.message, allowed_mentions: { parse: [] } }) });
             if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
             return reply(`✅ Sent.`, true);
+          }
+
+          if (cmd === "slowmode") {
+            const sec = Math.max(0, Math.min(21600, parseInt(opts.seconds, 10) || 0));
+            const res = await discordApi(`/channels/${body.channel_id}`, { method: "PATCH", body: JSON.stringify({ rate_limit_per_user: sec }) });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(sec === 0 ? `🟢 Slowmode disabled.` : `🐢 Slowmode set to ${sec}s.`);
+          }
+
+          if (cmd === "lock" || cmd === "unlock") {
+            const everyoneId = guildId;
+            const deny = cmd === "lock" ? "2048" : "0";
+            const allow = cmd === "unlock" ? "2048" : "0";
+            const res = await discordApi(`/channels/${body.channel_id}/permissions/${everyoneId}`, {
+              method: "PUT", body: JSON.stringify({ id: everyoneId, type: 0, allow, deny }),
+            });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(cmd === "lock" ? `🔒 Channel locked.` : `🔓 Channel unlocked.`);
+          }
+
+          if (cmd === "addrole" || cmd === "removerole") {
+            const roleId = opts.role;
+            const res = await discordApi(`/guilds/${guildId}/members/${targetId}/roles/${roleId}`,
+              { method: cmd === "addrole" ? "PUT" : "DELETE" });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(cmd === "addrole" ? `✅ Added <@&${roleId}> to <@${targetId}>.` : `✅ Removed <@&${roleId}> from <@${targetId}>.`);
+          }
+
+          if (cmd === "createrole") {
+            const color = opts.color ? parseInt(opts.color.replace("#",""), 16) : 0;
+            const res = await discordApi(`/guilds/${guildId}/roles`, {
+              method: "POST", body: JSON.stringify({ name: opts.name, color: isNaN(color) ? 0 : color, mentionable: true }),
+            });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            const r = await res.json();
+            return reply(`✅ Created role <@&${r.id}>.`);
+          }
+
+          if (cmd === "deleterole") {
+            const res = await discordApi(`/guilds/${guildId}/roles/${opts.role}`, { method: "DELETE" });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(`🗑️ Role deleted.`);
+          }
+
+          if (cmd === "createchannel") {
+            const res = await discordApi(`/guilds/${guildId}/channels`, {
+              method: "POST", body: JSON.stringify({ name: opts.name, type: 0 }),
+            });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            const c = await res.json();
+            return reply(`✅ Created <#${c.id}>.`);
+          }
+
+          if (cmd === "deletechannel") {
+            const res = await discordApi(`/channels/${opts.channel}`, { method: "DELETE" });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(`🗑️ Channel deleted.`);
+          }
+
+          if (cmd === "renamechannel") {
+            const res = await discordApi(`/channels/${opts.channel}`, { method: "PATCH", body: JSON.stringify({ name: opts.name }) });
+            if (!res.ok) return reply(`❌ Discord ${res.status}: ${await res.text()}`, true);
+            return reply(`✏️ Renamed <#${opts.channel}> to **${opts.name}**.`);
           }
 
           return reply("Unknown command.");
