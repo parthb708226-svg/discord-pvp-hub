@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTiersRouteImport } from './routes/_authenticated/admin.tiers'
+import { Route as AuthenticatedAdminSuperRouteImport } from './routes/_authenticated/admin.super'
 import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
 import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
 import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
@@ -75,6 +76,11 @@ const AuthenticatedAdminTiersRoute = AuthenticatedAdminTiersRouteImport.update({
   path: '/tiers',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSuperRoute = AuthenticatedAdminSuperRouteImport.update({
+  id: '/super',
+  path: '/super',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminGamemodesRoute =
   AuthenticatedAdminGamemodesRouteImport.update({
     id: '/gamemodes',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/tier/$slug': typeof TierSlugRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/super': typeof AuthenticatedAdminSuperRoute
   '/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/tier/$slug': typeof TierSlugRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/super': typeof AuthenticatedAdminSuperRoute
   '/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/tier/$slug': typeof TierSlugRoute
   '/_authenticated/admin/bot': typeof AuthenticatedAdminBotRoute
   '/_authenticated/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/_authenticated/admin/super': typeof AuthenticatedAdminSuperRoute
   '/_authenticated/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/tier/$slug'
     | '/admin/bot'
     | '/admin/gamemodes'
+    | '/admin/super'
     | '/admin/tiers'
     | '/admin/users'
     | '/admin/'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/tier/$slug'
     | '/admin/bot'
     | '/admin/gamemodes'
+    | '/admin/super'
     | '/admin/tiers'
     | '/admin/users'
     | '/admin'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/tier/$slug'
     | '/_authenticated/admin/bot'
     | '/_authenticated/admin/gamemodes'
+    | '/_authenticated/admin/super'
     | '/_authenticated/admin/tiers'
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/'
@@ -299,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTiersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/super': {
+      id: '/_authenticated/admin/super'
+      path: '/super'
+      fullPath: '/admin/super'
+      preLoaderRoute: typeof AuthenticatedAdminSuperRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/gamemodes': {
       id: '/_authenticated/admin/gamemodes'
       path: '/gamemodes'
@@ -347,6 +366,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBotRoute: typeof AuthenticatedAdminBotRoute
   AuthenticatedAdminGamemodesRoute: typeof AuthenticatedAdminGamemodesRoute
+  AuthenticatedAdminSuperRoute: typeof AuthenticatedAdminSuperRoute
   AuthenticatedAdminTiersRoute: typeof AuthenticatedAdminTiersRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -355,6 +375,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBotRoute: AuthenticatedAdminBotRoute,
   AuthenticatedAdminGamemodesRoute: AuthenticatedAdminGamemodesRoute,
+  AuthenticatedAdminSuperRoute: AuthenticatedAdminSuperRoute,
   AuthenticatedAdminTiersRoute: AuthenticatedAdminTiersRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
