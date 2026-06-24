@@ -161,6 +161,12 @@ export const updateBotConfigFn = createServerFn({ method: "POST" })
     tier_announcements_enabled?: boolean;
     welcomer_enabled?: boolean;
     chat_gate_enabled?: boolean;
+    automod_enabled?: boolean;
+    automod_anti_invite?: boolean;
+    automod_anti_link?: boolean;
+    automod_anti_spam?: boolean;
+    automod_blocked_words?: string[];
+    automod_log_channel_id?: string | null;
   }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
