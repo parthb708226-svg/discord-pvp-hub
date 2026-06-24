@@ -74,6 +74,26 @@ export const Route = createFileRoute("/api/public/gateway/event")({
             return Response.json({ ok: true, level, xp, leveled_up: leveled });
           }
 
+          if (action === "automod_check") {
+            const content = String(payload.content ?? "");
+            const { data: cfg } = await supabaseAdmin.from("bot_config").select("automod_enabled, automod_anti_invite, automod_anti_link, automod_blocked_words").eq("id", "main").maybeSingle();
+            if (!cfg?.automod_enabled) return Response.json({ block: false });
+            const lc = content.toLowerCase();
+            if (cfg.automod_anti_invite && /(discord\.gg|discord\.com\/invite|discordapp\.com\/invite)/i.test(content)) {
+              return Response.json({ block: true, reason: "Discord invites are not allowed" });
+            }
+            if (cfg.automod_anti_link && /https?:\/\//i.test(content)) {
+              return Response.json({ block: true, reason: "External links are not allowed" });
+            }
+            for (const w of (cfg.automod_blocked_words ?? [])) {
+              if (w && lc.includes(String(w).toLowerCase())) {
+                return Response.json({ block: true, reason: `Blocked word: ${w}` });
+              }
+            }
+            return Response.json({ block: false });
+          }
+
+
           return new Response("unknown action", { status: 400 });
         } catch (e) {
           console.error("[gateway-webhook]", e);

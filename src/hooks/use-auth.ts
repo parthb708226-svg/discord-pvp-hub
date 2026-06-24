@@ -25,8 +25,11 @@ export function useAuth() {
 
   useEffect(() => {
     if (!user) { setRoles([]); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
-      setRoles((data ?? []).map(r => r.role as AppRole));
+    // Self-heal: if locked super-admin lost their roles, re-grant them
+    supabase.rpc("ensure_locked_owner_roles" as any).then(() => {
+      supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
+        setRoles((data ?? []).map(r => r.role as AppRole));
+      });
     });
   }, [user?.id]);
 

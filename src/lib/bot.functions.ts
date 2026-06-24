@@ -96,6 +96,38 @@ export const registerBotCommands = createServerFn({ method: "POST" })
         { name: "channel", description: "Channel", type: 7, required: true },
         { name: "message", description: "Message body", type: 3, required: true },
       ]},
+      { name: "slowmode", description: "Set channel slowmode in seconds (0=off)", default_member_permissions: "0", options: [
+        { name: "seconds", description: "0-21600", type: 4, required: true },
+      ]},
+      { name: "lock", description: "Lock current channel (admin only)", default_member_permissions: "0" },
+      { name: "unlock", description: "Unlock current channel (admin only)", default_member_permissions: "0" },
+      // Role mgmt
+      { name: "addrole", description: "Add a role to a member (admin only)", default_member_permissions: "0", options: [
+        { name: "user", description: "Member", type: 6, required: true },
+        { name: "role", description: "Role", type: 8, required: true },
+      ]},
+      { name: "removerole", description: "Remove a role from a member (admin only)", default_member_permissions: "0", options: [
+        { name: "user", description: "Member", type: 6, required: true },
+        { name: "role", description: "Role", type: 8, required: true },
+      ]},
+      { name: "createrole", description: "Create a new role (admin only)", default_member_permissions: "0", options: [
+        { name: "name", description: "Role name", type: 3, required: true },
+        { name: "color", description: "Hex color e.g. ff5500", type: 3, required: false },
+      ]},
+      { name: "deleterole", description: "Delete a role (admin only)", default_member_permissions: "0", options: [
+        { name: "role", description: "Role", type: 8, required: true },
+      ]},
+      // Channel mgmt
+      { name: "createchannel", description: "Create a text channel (admin only)", default_member_permissions: "0", options: [
+        { name: "name", description: "Channel name", type: 3, required: true },
+      ]},
+      { name: "deletechannel", description: "Delete a channel (admin only)", default_member_permissions: "0", options: [
+        { name: "channel", description: "Channel", type: 7, required: true },
+      ]},
+      { name: "renamechannel", description: "Rename a channel (admin only)", default_member_permissions: "0", options: [
+        { name: "channel", description: "Channel", type: 7, required: true },
+        { name: "name", description: "New name", type: 3, required: true },
+      ]},
     ];
 
     const url = `https://discord.com/api/v10/applications/${appId}/guilds/${guildId}/commands`;
@@ -129,6 +161,12 @@ export const updateBotConfigFn = createServerFn({ method: "POST" })
     tier_announcements_enabled?: boolean;
     welcomer_enabled?: boolean;
     chat_gate_enabled?: boolean;
+    automod_enabled?: boolean;
+    automod_anti_invite?: boolean;
+    automod_anti_link?: boolean;
+    automod_anti_spam?: boolean;
+    automod_blocked_words?: string[];
+    automod_log_channel_id?: string | null;
   }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context);

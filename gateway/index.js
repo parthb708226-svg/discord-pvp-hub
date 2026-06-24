@@ -59,9 +59,35 @@ client.on(Events.GuildMemberAdd, async member => {
 // ---------- Chat gate + XP ----------
 const xpCooldown = new Map(); // discord_id -> ms
 
+const spamWindow = new Map(); // discord_id -> [timestamps]
+
 client.on(Events.MessageCreate, async message => {
   if (message.author.bot || !message.guild) return;
   if (CHAT_GATE_EXEMPT_CHANNELS.has(message.channelId)) return;
+
+  // 0) Automod (anti-invite, anti-link, blocked words)
+  try {
+    const am = await callWebhook("automod_check", { content: message.content });
+    if (am?.block) {
+      try { await message.delete(); } catch {}
+      try {
+        const dm = await message.author.createDM();
+        await dm.send(`🚫 Your message in **${message.guild.name}** was removed: ${am.reason}`);
+      } catch {}
+      return;
+    }
+  } catch (e) { console.error("[automod]", e); }
+
+  // 0b) Anti-spam (5 msgs in 5s → delete + 60s timeout)
+  const now0 = Date.now();
+  const arr = (spamWindow.get(message.author.id) ?? []).filter(t => now0 - t < 5000);
+  arr.push(now0);
+  spamWindow.set(message.author.id, arr);
+  if (arr.length > 5) {
+    try { await message.delete(); } catch {}
+    try { await message.member?.timeout(60_000, "Spam"); } catch {}
+    return;
+  }
 
   // 1) Gate: is this user linked on the website?
   let linked = false;
