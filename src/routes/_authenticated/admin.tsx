@@ -29,6 +29,7 @@ const NAV: Array<{ to: string; label: string; exact?: boolean; adminOnly?: boole
 function AdminShell() {
   const { roles } = Route.useRouteContext();
   const isAdmin = roles.some((r: string) => r === "owner" || r === "admin");
+  const isOwner = roles.includes("owner");
   const pathname = useRouterState({ select: s => s.location.pathname });
   return (
     <div className="min-h-screen">
@@ -37,7 +38,7 @@ function AdminShell() {
         <aside>
           <Card className="p-2 pixel-border">
             <nav className="flex flex-col gap-1">
-              {NAV.filter(n => !n.adminOnly || isAdmin).map(n => {
+              {NAV.filter(n => (!n.adminOnly || isAdmin) && (!n.ownerOnly || isOwner)).map(n => {
                 const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
                 return (
                   <Link key={n.to} to={n.to as any}
