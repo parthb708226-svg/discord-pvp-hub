@@ -54,6 +54,12 @@ export type Database = {
       }
       bot_config: {
         Row: {
+          automod_anti_invite: boolean
+          automod_anti_link: boolean
+          automod_anti_spam: boolean
+          automod_blocked_words: string[]
+          automod_enabled: boolean
+          automod_log_channel_id: string | null
           chat_gate_enabled: boolean
           gamemode_log_channel_id: string | null
           id: string
@@ -66,6 +72,12 @@ export type Database = {
           welcomer_enabled: boolean
         }
         Insert: {
+          automod_anti_invite?: boolean
+          automod_anti_link?: boolean
+          automod_anti_spam?: boolean
+          automod_blocked_words?: string[]
+          automod_enabled?: boolean
+          automod_log_channel_id?: string | null
           chat_gate_enabled?: boolean
           gamemode_log_channel_id?: string | null
           id?: string
@@ -78,6 +90,12 @@ export type Database = {
           welcomer_enabled?: boolean
         }
         Update: {
+          automod_anti_invite?: boolean
+          automod_anti_link?: boolean
+          automod_anti_spam?: boolean
+          automod_blocked_words?: string[]
+          automod_enabled?: boolean
+          automod_log_channel_id?: string | null
           chat_gate_enabled?: boolean
           gamemode_log_channel_id?: string | null
           id?: string
@@ -241,6 +259,62 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          active_theme_id: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          active_theme_id?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          active_theme_id?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_settings_active_theme_id_fkey"
+            columns: ["active_theme_id"]
+            isOneToOne: false
+            referencedRelation: "site_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_themes: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          vars: Json
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          vars: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          vars?: Json
+        }
+        Relationships: []
+      }
       user_levels: {
         Row: {
           created_at: string
@@ -327,6 +401,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_locked_owner_roles: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -335,6 +410,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_locked_owner: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
