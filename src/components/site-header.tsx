@@ -17,6 +17,7 @@ export function SiteHeader() {
         <nav className="hidden md:flex items-center gap-1 text-sm">
           <Link to="/" className="px-3 py-2 rounded-md hover:bg-muted [&.active]:text-primary [&.active]:font-semibold" activeOptions={{ exact: true }}>Home</Link>
           <Link to="/leaderboard" className="px-3 py-2 rounded-md hover:bg-muted [&.active]:text-primary">Leaderboard</Link>
+          <Link to="/matches" className="px-3 py-2 rounded-md hover:bg-muted [&.active]:text-primary">Matches</Link>
         </nav>
         <div className="flex items-center gap-2">
           {isAdmin && (

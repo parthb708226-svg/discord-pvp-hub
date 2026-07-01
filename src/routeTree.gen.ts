@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -20,6 +21,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTiersRouteImport } from './routes/_authenticated/admin.tiers'
 import { Route as AuthenticatedAdminSuperRouteImport } from './routes/_authenticated/admin.super'
+import { Route as AuthenticatedAdminMatchesRouteImport } from './routes/_authenticated/admin.matches'
 import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
 import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
 import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
@@ -27,6 +29,11 @@ import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/p
 import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
 import { Route as ApiAuthDiscordCallbackRouteImport } from './routes/api/auth/discord/callback'
 
+const MatchesRoute = MatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
@@ -81,6 +88,12 @@ const AuthenticatedAdminSuperRoute = AuthenticatedAdminSuperRouteImport.update({
   path: '/super',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminMatchesRoute =
+  AuthenticatedAdminMatchesRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminGamemodesRoute =
   AuthenticatedAdminGamemodesRouteImport.update({
     id: '/gamemodes',
@@ -118,11 +131,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/matches': typeof MatchesRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/matches': typeof AuthenticatedAdminMatchesRoute
   '/admin/super': typeof AuthenticatedAdminSuperRoute
   '/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -136,10 +151,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/matches': typeof MatchesRoute
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/admin/matches': typeof AuthenticatedAdminMatchesRoute
   '/admin/super': typeof AuthenticatedAdminSuperRoute
   '/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -155,11 +172,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/matches': typeof MatchesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
   '/_authenticated/admin/bot': typeof AuthenticatedAdminBotRoute
   '/_authenticated/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
+  '/_authenticated/admin/matches': typeof AuthenticatedAdminMatchesRoute
   '/_authenticated/admin/super': typeof AuthenticatedAdminSuperRoute
   '/_authenticated/admin/tiers': typeof AuthenticatedAdminTiersRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -175,11 +194,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/leaderboard'
+    | '/matches'
     | '/admin'
     | '/player/$username'
     | '/tier/$slug'
     | '/admin/bot'
     | '/admin/gamemodes'
+    | '/admin/matches'
     | '/admin/super'
     | '/admin/tiers'
     | '/admin/users'
@@ -193,10 +214,12 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/leaderboard'
+    | '/matches'
     | '/player/$username'
     | '/tier/$slug'
     | '/admin/bot'
     | '/admin/gamemodes'
+    | '/admin/matches'
     | '/admin/super'
     | '/admin/tiers'
     | '/admin/users'
@@ -211,11 +234,13 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/leaderboard'
+    | '/matches'
     | '/_authenticated/admin'
     | '/player/$username'
     | '/tier/$slug'
     | '/_authenticated/admin/bot'
     | '/_authenticated/admin/gamemodes'
+    | '/_authenticated/admin/matches'
     | '/_authenticated/admin/super'
     | '/_authenticated/admin/tiers'
     | '/_authenticated/admin/users'
@@ -231,6 +256,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  MatchesRoute: typeof MatchesRoute
   PlayerUsernameRoute: typeof PlayerUsernameRoute
   TierSlugRoute: typeof TierSlugRoute
   ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
@@ -241,6 +267,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/matches': {
+      id: '/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leaderboard': {
       id: '/leaderboard'
       path: '/leaderboard'
@@ -318,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSuperRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/matches': {
+      id: '/_authenticated/admin/matches'
+      path: '/matches'
+      fullPath: '/admin/matches'
+      preLoaderRoute: typeof AuthenticatedAdminMatchesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/gamemodes': {
       id: '/_authenticated/admin/gamemodes'
       path: '/gamemodes'
@@ -366,6 +406,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBotRoute: typeof AuthenticatedAdminBotRoute
   AuthenticatedAdminGamemodesRoute: typeof AuthenticatedAdminGamemodesRoute
+  AuthenticatedAdminMatchesRoute: typeof AuthenticatedAdminMatchesRoute
   AuthenticatedAdminSuperRoute: typeof AuthenticatedAdminSuperRoute
   AuthenticatedAdminTiersRoute: typeof AuthenticatedAdminTiersRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -375,6 +416,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBotRoute: AuthenticatedAdminBotRoute,
   AuthenticatedAdminGamemodesRoute: AuthenticatedAdminGamemodesRoute,
+  AuthenticatedAdminMatchesRoute: AuthenticatedAdminMatchesRoute,
   AuthenticatedAdminSuperRoute: AuthenticatedAdminSuperRoute,
   AuthenticatedAdminTiersRoute: AuthenticatedAdminTiersRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
@@ -400,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LeaderboardRoute: LeaderboardRoute,
+  MatchesRoute: MatchesRoute,
   PlayerUsernameRoute: PlayerUsernameRoute,
   TierSlugRoute: TierSlugRoute,
   ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
@@ -410,13 +453,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
