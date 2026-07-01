@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const NAV: Array<{ to: string; label: string; exact?: boolean; adminOnly?: boolean; ownerOnly?: boolean }> = [
   { to: "/admin", label: "Dashboard", exact: true },
   { to: "/admin/tiers", label: "Tiers" },
+  { to: "/admin/matches", label: "Matches" },
   { to: "/admin/gamemodes", label: "Gamemodes", adminOnly: true },
   { to: "/admin/users", label: "Users & Roles", adminOnly: true },
   { to: "/admin/bot", label: "Discord Bot", adminOnly: true },
