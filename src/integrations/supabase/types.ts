@@ -139,6 +139,115 @@ export type Database = {
         }
         Relationships: []
       }
+      matches: {
+        Row: {
+          created_at: string
+          gamemode_id: string
+          id: string
+          is_draw: boolean
+          loser_elo_after: number | null
+          loser_elo_before: number | null
+          loser_id: string
+          loser_score: number
+          notes: string | null
+          played_at: string
+          reported_by: string | null
+          season_id: string | null
+          status: string
+          updated_at: string
+          verified_by: string | null
+          winner_elo_after: number | null
+          winner_elo_before: number | null
+          winner_id: string
+          winner_score: number
+        }
+        Insert: {
+          created_at?: string
+          gamemode_id: string
+          id?: string
+          is_draw?: boolean
+          loser_elo_after?: number | null
+          loser_elo_before?: number | null
+          loser_id: string
+          loser_score?: number
+          notes?: string | null
+          played_at?: string
+          reported_by?: string | null
+          season_id?: string | null
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          winner_elo_after?: number | null
+          winner_elo_before?: number | null
+          winner_id: string
+          winner_score?: number
+        }
+        Update: {
+          created_at?: string
+          gamemode_id?: string
+          id?: string
+          is_draw?: boolean
+          loser_elo_after?: number | null
+          loser_elo_before?: number | null
+          loser_id?: string
+          loser_score?: number
+          notes?: string | null
+          played_at?: string
+          reported_by?: string | null
+          season_id?: string | null
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          winner_elo_after?: number | null
+          winner_elo_before?: number | null
+          winner_id?: string
+          winner_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_gamemode_id_fkey"
+            columns: ["gamemode_id"]
+            isOneToOne: false
+            referencedRelation: "gamemodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_loser_id_fkey"
+            columns: ["loser_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_winner_id_fkey"
+            columns: ["winner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mod_actions: {
         Row: {
           action: string
@@ -174,6 +283,130 @@ export type Database = {
           target_username?: string | null
         }
         Relationships: []
+      }
+      player_elo: {
+        Row: {
+          created_at: string
+          current_streak: number
+          draws: number
+          elo: number
+          gamemode_id: string
+          last_match_at: string | null
+          longest_streak: number
+          losses: number
+          peak_elo: number
+          profile_id: string
+          updated_at: string
+          wins: number
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          draws?: number
+          elo?: number
+          gamemode_id: string
+          last_match_at?: string | null
+          longest_streak?: number
+          losses?: number
+          peak_elo?: number
+          profile_id: string
+          updated_at?: string
+          wins?: number
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          draws?: number
+          elo?: number
+          gamemode_id?: string
+          last_match_at?: string | null
+          longest_streak?: number
+          losses?: number
+          peak_elo?: number
+          profile_id?: string
+          updated_at?: string
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_elo_gamemode_id_fkey"
+            columns: ["gamemode_id"]
+            isOneToOne: false
+            referencedRelation: "gamemodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_elo_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_seasons: {
+        Row: {
+          created_at: string
+          draws: number
+          final_elo: number
+          final_rank: number | null
+          gamemode_id: string
+          id: string
+          losses: number
+          peak_elo: number
+          profile_id: string
+          season_id: string
+          wins: number
+        }
+        Insert: {
+          created_at?: string
+          draws?: number
+          final_elo: number
+          final_rank?: number | null
+          gamemode_id: string
+          id?: string
+          losses?: number
+          peak_elo: number
+          profile_id: string
+          season_id: string
+          wins?: number
+        }
+        Update: {
+          created_at?: string
+          draws?: number
+          final_elo?: number
+          final_rank?: number | null
+          gamemode_id?: string
+          id?: string
+          losses?: number
+          peak_elo?: number
+          profile_id?: string
+          season_id?: string
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_seasons_gamemode_id_fkey"
+            columns: ["gamemode_id"]
+            isOneToOne: false
+            referencedRelation: "gamemodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_seasons_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_seasons_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       player_tiers: {
         Row: {
@@ -256,6 +489,33 @@ export type Database = {
           id?: string
           minecraft_username?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      seasons: {
+        Row: {
+          active: boolean
+          created_at: string
+          ends_at: string | null
+          id: string
+          name: string
+          starts_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name: string
+          starts_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name?: string
+          starts_at?: string
         }
         Relationships: []
       }
@@ -401,6 +661,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_elo_row: {
+        Args: { _gamemode_id: string; _profile_id: string }
+        Returns: {
+          created_at: string
+          current_streak: number
+          draws: number
+          elo: number
+          gamemode_id: string
+          last_match_at: string | null
+          longest_streak: number
+          losses: number
+          peak_elo: number
+          profile_id: string
+          updated_at: string
+          wins: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "player_elo"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       ensure_locked_owner_roles: { Args: never; Returns: undefined }
       has_role: {
         Args: {
@@ -412,6 +695,36 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_locked_owner: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      verify_match: {
+        Args: { _match_id: string }
+        Returns: {
+          created_at: string
+          gamemode_id: string
+          id: string
+          is_draw: boolean
+          loser_elo_after: number | null
+          loser_elo_before: number | null
+          loser_id: string
+          loser_score: number
+          notes: string | null
+          played_at: string
+          reported_by: string | null
+          season_id: string | null
+          status: string
+          updated_at: string
+          verified_by: string | null
+          winner_elo_after: number | null
+          winner_elo_before: number | null
+          winner_id: string
+          winner_score: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "matches"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "tester" | "user"
