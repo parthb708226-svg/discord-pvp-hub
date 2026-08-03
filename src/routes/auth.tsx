@@ -7,11 +7,16 @@ import { Card } from "@/components/ui/card";
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — PvP Tiers" }] }),
   component: AuthPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    token_hash: typeof s.token_hash === "string" ? s.token_hash : undefined,
-    type: typeof s.type === "string" ? s.type : undefined,
-    error: typeof s.error === "string" ? s.error : undefined,
-    next: typeof s.next === "string" ? s.next : undefined,
+  validateSearch: (s: Record<string, unknown>): {
+    token_hash?: string;
+    type?: string;
+    error?: string;
+    next?: string;
+  } => ({
+    ...(typeof s.token_hash === "string" ? { token_hash: s.token_hash } : {}),
+    ...(typeof s.type === "string" ? { type: s.type } : {}),
+    ...(typeof s.error === "string" ? { error: s.error } : {}),
+    ...(typeof s.next === "string" ? { next: s.next } : {}),
   }),
 });
 
