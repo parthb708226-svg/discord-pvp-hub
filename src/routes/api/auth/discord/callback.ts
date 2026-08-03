@@ -10,6 +10,8 @@ export const Route = createFileRoute("/api/auth/discord/callback")({
           const state = url.searchParams.get("state");
           const cookieHeader = request.headers.get("cookie") ?? "";
           const cookieState = cookieHeader.split(/;\s*/).find(c => c.startsWith("discord_oauth_state="))?.split("=")[1];
+          const rawNext = decodeURIComponent(cookieHeader.split(/;\s*/).find(c => c.startsWith("discord_oauth_next="))?.split("=")[1] ?? "");
+          const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "";
 
           if (!code) return redirectTo("/auth?error=missing_code", url.origin);
           if (!state || !cookieState || state !== cookieState) return redirectTo("/auth?error=bad_state", url.origin);
@@ -86,13 +88,12 @@ export const Route = createFileRoute("/api/auth/discord/callback")({
           const hashed = (link.properties as any)?.hashed_token ?? new URL(link.properties.action_link).searchParams.get("token");
           if (!hashed) return redirectTo("/auth?error=no_token", url.origin);
 
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location: `/auth?token_hash=${encodeURIComponent(hashed)}&type=email`,
-              "Set-Cookie": `discord_oauth_state=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
-            },
+          const headers = new Headers({
+            Location: `/auth?token_hash=${encodeURIComponent(hashed)}&type=email${next ? `&next=${encodeURIComponent(next)}` : ""}`,
           });
+          headers.append("Set-Cookie", `discord_oauth_state=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+          headers.append("Set-Cookie", `discord_oauth_next=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+          return new Response(null, { status: 302, headers });
         } catch (e) {
           console.error("[discord-callback]", e);
           return new Response("Auth error: " + (e as Error).message, { status: 500 });

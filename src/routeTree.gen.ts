@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -17,6 +18,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TierSlugRouteImport } from './routes/tier.$slug'
 import { Route as PlayerUsernameRouteImport } from './routes/player.$username'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTiersRouteImport } from './routes/_authenticated/admin.tiers'
@@ -24,11 +27,18 @@ import { Route as AuthenticatedAdminSuperRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminMatchesRouteImport } from './routes/_authenticated/admin.matches'
 import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
 import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
 import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/public/discord/interactions'
 import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
 import { Route as ApiAuthDiscordCallbackRouteImport } from './routes/api/auth/discord/callback'
 
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
@@ -68,6 +78,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -105,6 +127,17 @@ const AuthenticatedAdminBotRoute = AuthenticatedAdminBotRouteImport.update({
   path: '/bot',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGatewayEventRoute = ApiPublicGatewayEventRouteImport.update({
   id: '/api/public/gateway/event',
   path: '/api/public/gateway/event',
@@ -132,9 +165,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
   '/matches': typeof MatchesRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -152,8 +190,13 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
   '/matches': typeof MatchesRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -173,9 +216,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/leaderboard': typeof LeaderboardRoute
   '/matches': typeof MatchesRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/bot': typeof AuthenticatedAdminBotRoute
   '/_authenticated/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/_authenticated/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -195,9 +243,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/leaderboard'
     | '/matches'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/bot'
     | '/admin/gamemodes'
     | '/admin/matches'
@@ -215,8 +268,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/leaderboard'
     | '/matches'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/bot'
     | '/admin/gamemodes'
     | '/admin/matches'
@@ -235,9 +293,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/leaderboard'
     | '/matches'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/bot'
     | '/_authenticated/admin/gamemodes'
     | '/_authenticated/admin/matches'
@@ -257,8 +320,13 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LeaderboardRoute: typeof LeaderboardRoute
   MatchesRoute: typeof MatchesRoute
+  McpRoute: typeof McpRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   PlayerUsernameRoute: typeof PlayerUsernameRoute
   TierSlugRoute: typeof TierSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
   ApiAuthDiscordStartRoute: typeof ApiAuthDiscordStartRoute
   ApiPublicDiscordInteractionsRoute: typeof ApiPublicDiscordInteractionsRoute
@@ -267,6 +335,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/matches': {
       id: '/matches'
       path: '/matches'
@@ -323,6 +398,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -371,6 +460,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/bot'
       preLoaderRoute: typeof AuthenticatedAdminBotRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/gateway/event': {
       id: '/api/public/gateway/event'
@@ -443,8 +546,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LeaderboardRoute: LeaderboardRoute,
   MatchesRoute: MatchesRoute,
+  McpRoute: McpRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   PlayerUsernameRoute: PlayerUsernameRoute,
   TierSlugRoute: TierSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
   ApiAuthDiscordStartRoute: ApiAuthDiscordStartRoute,
   ApiPublicDiscordInteractionsRoute: ApiPublicDiscordInteractionsRoute,
@@ -453,3 +562,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

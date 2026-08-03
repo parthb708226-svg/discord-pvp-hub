@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://hivjvxlrvyvhczhmnqwm.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "pvp-tier-hub",
+      "version": "0.1.0",
+      "title": "PvP Tier Hub"
+    },
+    "tools": [
+      {
+        "name": "list_gamemodes",
+        "title": "List gamemodes",
+        "description": "List every PvP gamemode (Crystal, Sword, Archer, ...) with its slug.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_tier_list",
+        "title": "Get tier list",
+        "description": "Get the ranked tier list for one gamemode slug (for example 'crystal' or 'archer').",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "gamemode": {
+              "type": "string",
+              "description": "Gamemode slug, e.g. 'crystal'."
+            }
+          },
+          "required": [
+            "gamemode"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_player",
+        "title": "Get player",
+        "description": "Get all tiers a Minecraft player holds across gamemodes.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "Minecraft username."
+            }
+          },
+          "required": [
+            "username"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_elo_leaderboard",
+        "title": "Get Elo leaderboard",
+        "description": "Top players by Elo rating, optionally filtered to one gamemode slug.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "gamemode": {
+              "description": "Optional gamemode slug to filter by.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "How many rows to return (default 20, max 100).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "set_player_tier",
+        "title": "Set player tier",
+        "description": "Award or update a player's tier in a gamemode. Requires a signed-in tester/admin account; the database rejects other callers.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "Minecraft username."
+            },
+            "gamemode": {
+              "type": "string",
+              "description": "Gamemode slug, e.g. 'crystal'."
+            },
+            "tier": {
+              "type": "string",
+              "enum": [
+                "HT1",
+                "LT1",
+                "HT2",
+                "LT2",
+                "HT3",
+                "LT3",
+                "HT4",
+                "LT4",
+                "HT5",
+                "LT5",
+                "Retired"
+              ],
+              "description": "Tier rank to assign."
+            },
+            "region": {
+              "description": "Region code: NA, EU, AS, SA, OC, AF, Unknown.",
+              "type": "string"
+            },
+            "notes": {
+              "description": "Optional tester notes.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "username",
+            "gamemode",
+            "tier"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
