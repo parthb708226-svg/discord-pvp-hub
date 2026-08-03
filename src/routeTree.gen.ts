@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminSuperRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminMatchesRouteImport } from './routes/_authenticated/admin.matches'
 import { Route as AuthenticatedAdminGamemodesRouteImport } from './routes/_authenticated/admin.gamemodes'
 import { Route as AuthenticatedAdminBotRouteImport } from './routes/_authenticated/admin.bot'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
 import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/public/discord/interactions'
 import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
@@ -105,6 +106,11 @@ const AuthenticatedAdminBotRoute = AuthenticatedAdminBotRouteImport.update({
   path: '/bot',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGatewayEventRoute = ApiPublicGatewayEventRouteImport.update({
   id: '/api/public/gateway/event',
   path: '/api/public/gateway/event',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/matches': typeof MatchesRoute
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/bot': typeof AuthenticatedAdminBotRoute
   '/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/player/$username': typeof PlayerUsernameRoute
   '/tier/$slug': typeof TierSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/bot': typeof AuthenticatedAdminBotRoute
   '/_authenticated/admin/gamemodes': typeof AuthenticatedAdminGamemodesRoute
   '/_authenticated/admin/matches': typeof AuthenticatedAdminMatchesRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
     | '/admin/bot'
     | '/admin/gamemodes'
     | '/admin/matches'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
     | '/admin/bot'
     | '/admin/gamemodes'
     | '/admin/matches'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/player/$username'
     | '/tier/$slug'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/bot'
     | '/_authenticated/admin/gamemodes'
     | '/_authenticated/admin/matches'
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRoute
   PlayerUsernameRoute: typeof PlayerUsernameRoute
   TierSlugRoute: typeof TierSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
   ApiAuthDiscordStartRoute: typeof ApiAuthDiscordStartRoute
   ApiPublicDiscordInteractionsRoute: typeof ApiPublicDiscordInteractionsRoute
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBotRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/gateway/event': {
       id: '/api/public/gateway/event'
       path: '/api/public/gateway/event'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRoute,
   PlayerUsernameRoute: PlayerUsernameRoute,
   TierSlugRoute: TierSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
   ApiAuthDiscordStartRoute: ApiAuthDiscordStartRoute,
   ApiPublicDiscordInteractionsRoute: ApiPublicDiscordInteractionsRoute,
