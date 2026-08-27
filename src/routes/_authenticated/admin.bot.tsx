@@ -29,7 +29,8 @@ function BotConfig() {
   const testFn = useServerFn(testAnnounceFn);
 
   const { data: cfg } = useQuery({ queryKey: ["bot_config"], queryFn: () => getCfg() });
-  const { data: channels } = useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans() });
+  const { data: channels, error: channelsError, isLoading: channelsLoading, refetch: refetchChannels } =
+    useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans(), retry: false });
   const { data: actions } = useQuery({ queryKey: ["mod_actions"], queryFn: () => listActs() });
 
   const [draft, setDraft] = useState<any>(null);
