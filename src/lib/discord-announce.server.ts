@@ -21,19 +21,40 @@ export async function getBotConfig() {
   return data ?? null;
 }
 
-async function postChannel(channelId: string | null | undefined, body: any) {
-  if (!channelId) return;
+export type PostResult = { ok: boolean; reason?: string };
+
+function friendly(status: number, code: number | undefined, channelId: string) {
+  if (code === 50013) return `Missing Permissions in channel ${channelId}. Give the bot "View Channel", "Send Messages" and "Embed Links" there (channel permissions override server roles).`;
+  if (code === 50001) return `Missing Access to channel ${channelId}. The bot's role cannot see this channel — add it to the channel's permission overrides.`;
+  if (status === 404) return `Channel ${channelId} no longer exists — pick a new one in the Channels tab.`;
+  if (status === 401) return "The bot token is invalid. Re-check the bot token secret.";
+  return `Discord rejected the message (HTTP ${status}) for channel ${channelId}.`;
+}
+
+async function postChannel(channelId: string | null | undefined, body: any): Promise<PostResult> {
+  if (!channelId) return { ok: false, reason: "No channel selected yet — pick one in Admin → Discord Bot → Channels." };
   const token = process.env.DISCORD_BOT_TOKEN;
-  if (!token) return;
+  if (!token) return { ok: false, reason: "Bot token is not configured." };
   try {
     const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
       method: "POST",
       headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    if (!res.ok) console.error("[discord-announce]", res.status, await res.text().catch(() => ""));
-  } catch (e) { console.error("[discord-announce]", e); }
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      let code: number | undefined;
+      try { code = JSON.parse(txt)?.code; } catch { /* ignore */ }
+      console.error("[discord-announce]", res.status, txt);
+      return { ok: false, reason: friendly(res.status, code, channelId) };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error("[discord-announce]", e);
+    return { ok: false, reason: `Network error contacting Discord: ${String(e)}` };
+  }
 }
+
 
 export const mcHead = (name: string) => `https://mc-heads.net/avatar/${encodeURIComponent(name)}/128`;
 export const mcBody = (name: string) => `https://mc-heads.net/body/${encodeURIComponent(name)}/256`;
@@ -49,9 +70,10 @@ export async function announceTierChange(opts: {
   isUpdate?: boolean;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.tier_announcements_enabled || !cfg.tier_announce_channel_id) return;
+  if (!cfg?.tier_announcements_enabled) return { ok: false, reason: "Tier announcements are turned off in Admin → Discord Bot." };
+  if (!cfg.tier_announce_channel_id) return { ok: false, reason: "No tier announcement channel selected." };
   const color = COLORS[opts.tier] ?? COLORS.info;
-  await postChannel(cfg.tier_announce_channel_id, {
+  return postChannel(cfg.tier_announce_channel_id, {
     embeds: [{
       title: `${opts.gamemodeIcon ?? "🏆"} ${opts.isUpdate ? "Tier Updated" : "New Tier Awarded"}`,
       description: `**${opts.player}** has been awarded **${opts.tier}** in **${opts.gamemodeName}**`,
@@ -78,8 +100,9 @@ export async function announceTierRemoval(opts: {
   websiteOrigin: string;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.tier_announcements_enabled || !cfg.tier_announce_channel_id) return;
-  await postChannel(cfg.tier_announce_channel_id, {
+  if (!cfg?.tier_announcements_enabled) return { ok: false, reason: "Tier announcements are turned off in Admin → Discord Bot." };
+  if (!cfg.tier_announce_channel_id) return { ok: false, reason: "No tier announcement channel selected." };
+  return postChannel(cfg.tier_announce_channel_id, {
     embeds: [{
       title: "❌ Tier Removed",
       description: `**${opts.player}**'s **${opts.tier}** in **${opts.gamemodeName}** has been removed.`,
@@ -103,10 +126,10 @@ export async function announceModAction(opts: {
   durationMinutes?: number | null;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.mod_log_channel_id) return;
+  if (!cfg?.mod_log_channel_id) return { ok: false, reason: "No mod-log channel selected." };
   const emoji = { WARN: "⚠️", MUTE: "🔇", UNMUTE: "🔊", KICK: "👢", BAN: "🔨", UNBAN: "♻️" }[opts.action];
   const isGood = opts.action === "UNMUTE" || opts.action === "UNBAN";
-  await postChannel(cfg.mod_log_channel_id, {
+  const modResult = await postChannel(cfg.mod_log_channel_id, {
     embeds: [{
       title: `${emoji} ${opts.action}`,
       color: isGood ? COLORS.unmod : COLORS.mod,
@@ -135,6 +158,7 @@ export async function announceModAction(opts: {
       duration_minutes: opts.durationMinutes ?? null,
     });
   } catch (e) { console.error("[mod-actions log]", e); }
+  return modResult;
 }
 
 export async function sendWelcome(opts: {
@@ -143,12 +167,13 @@ export async function sendWelcome(opts: {
   websiteUrl: string;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.welcomer_enabled || !cfg.welcome_channel_id) return;
+  if (!cfg?.welcomer_enabled) return { ok: false, reason: "Welcomer is turned off in Admin → Discord Bot." };
+  if (!cfg.welcome_channel_id) return { ok: false, reason: "No welcome channel selected." };
   const msg = (cfg.welcome_message ?? "")
     .replaceAll("{user}", `<@${opts.userId}>`)
     .replaceAll("{guild}", opts.guildName)
     .replaceAll("{website}", opts.websiteUrl);
-  await postChannel(cfg.welcome_channel_id, {
+  return postChannel(cfg.welcome_channel_id, {
     content: msg,
     embeds: [{
       color: COLORS.welcome,
