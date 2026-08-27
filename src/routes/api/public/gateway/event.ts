@@ -37,7 +37,7 @@ export const Route = createFileRoute("/api/public/gateway/event")({
             const guildName = String(payload.guild_name ?? "the server");
             if (!/^\d{5,32}$/.test(userId)) return new Response("bad id", { status: 400 });
             const { sendWelcome } = await import("@/lib/discord-announce.server");
-            const origin = process.env.SITE_ORIGIN ?? "https://discord-pvp-hub.lovable.app";
+            const origin = process.env.SITE_ORIGIN ?? "https://archer-tier-list.lovable.app";
             await sendWelcome({ userId, guildName, websiteUrl: origin });
             return Response.json({ ok: true });
           }

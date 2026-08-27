@@ -32,7 +32,7 @@ verifying the HMAC signature.
    - `GATEWAY_WEBHOOK_SECRET` — must equal the same secret set on the website
      (already added: `GATEWAY_WEBHOOK_SECRET`)
    - *(optional)* `GATEWAY_WEBHOOK_URL` — defaults to
-     `https://discord-pvp-hub.lovable.app/api/public/gateway/event`
+     `https://archer-tier-list.lovable.app/api/public/gateway/event`
 4. **Discord Developer Portal → your app → Bot → Privileged Gateway Intents**:
    - ☑ Server Members Intent
    - ☑ Message Content Intent

@@ -29,7 +29,8 @@ function BotConfig() {
   const testFn = useServerFn(testAnnounceFn);
 
   const { data: cfg } = useQuery({ queryKey: ["bot_config"], queryFn: () => getCfg() });
-  const { data: channels } = useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans() });
+  const { data: channels, error: channelsError, isLoading: channelsLoading, refetch: refetchChannels } =
+    useQuery({ queryKey: ["guild_channels"], queryFn: () => listChans(), retry: false });
   const { data: actions } = useQuery({ queryKey: ["mod_actions"], queryFn: () => listActs() });
 
   const [draft, setDraft] = useState<any>(null);
@@ -79,6 +80,19 @@ function BotConfig() {
           <Card className="p-6 space-y-4">
             <h2 className="font-bold text-lg">Channel routing</h2>
             <p className="text-sm text-muted-foreground">Where the bot sends each kind of message. Pick a channel from your server.</p>
+
+            {channelsLoading && <p className="text-sm text-muted-foreground">Loading channels from Discord…</p>}
+            {channelsError && (
+              <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm space-y-2">
+                <div className="font-bold">Couldn't load your server's channels</div>
+                <div className="text-muted-foreground">{(channelsError as Error).message}</div>
+                <Button size="sm" variant="outline" onClick={() => refetchChannels()}>Retry</Button>
+              </div>
+            )}
+            {!channelsLoading && !channelsError && channelOptions.length === 0 && (
+              <p className="text-sm text-muted-foreground">No text channels found — invite the bot to the server first (see the Setup tab).</p>
+            )}
+
 
             <ChannelField label="Welcome channel" value={draft.welcome_channel_id} options={channelOptions}
               onChange={v => setDraft({ ...draft, welcome_channel_id: v })} />
@@ -168,8 +182,12 @@ function BotConfig() {
             <Copyable value={interactionsUrl} />
           </Card>
           <Card className="p-6 space-y-3">
-            <h2 className="font-bold text-lg">2. Invite the bot</h2>
-            <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands`} />
+            <h2 className="font-bold text-lg">2. Invite the bot to your server</h2>
+            <p className="text-sm text-muted-foreground">
+              Connected server ID: <code>1542228895674146818</code> (<a className="underline" href="https://discord.gg/5hpefBfQ7g" target="_blank" rel="noreferrer">invite link</a>).
+              After inviting, come back and press "Register all slash commands".
+            </p>
+            <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands&guild_id=1542228895674146818`} />
           </Card>
           <Card className="p-6 space-y-3">
             <h2 className="font-bold text-lg">3. Gateway worker (welcome + chat-gate + XP)</h2>
