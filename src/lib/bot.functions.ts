@@ -180,15 +180,24 @@ export const listChannelsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const token = process.env.DISCORD_BOT_TOKEN!;
-    const guildId = process.env.DISCORD_GUILD_ID!;
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const guildId = process.env.DISCORD_GUILD_ID;
+    if (!token) throw new Error("Bot token is not configured");
+    if (!guildId) throw new Error("Server (guild) ID is not configured");
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
       headers: { Authorization: `Bot ${token}` },
     });
-    if (!res.ok) throw new Error(`Discord ${res.status}`);
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      if (res.status === 404) throw new Error("The bot is not in this Discord server (or the server ID is wrong).");
+      if (res.status === 401 || res.status === 403) throw new Error("The bot token is invalid or lacks access to this server.");
+      throw new Error(`Discord ${res.status}: ${txt.slice(0, 200)}`);
+    }
     const chans = (await res.json()) as Array<{ id: string; name: string; type: number; parent_id: string | null; position: number }>;
-    // Only text-like channels: 0=GUILD_TEXT, 5=ANNOUNCEMENT
-    return chans.filter(c => c.type === 0 || c.type === 5).sort((a, b) => a.position - b.position);
+    // Text-like channels: 0=TEXT, 5=ANNOUNCEMENT, 15=FORUM, 11/12=THREADS
+    return chans
+      .filter(c => [0, 5, 15, 11, 12].includes(c.type))
+      .sort((a, b) => a.position - b.position);
   });
 
 // ---------------- Tier write w/ announce ----------------
