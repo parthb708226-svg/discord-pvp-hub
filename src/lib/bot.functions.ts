@@ -265,14 +265,53 @@ export const testAnnounceFn = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const origin = process.env.SITE_ORIGIN ?? "https://archer-tier-list.lovable.app";
     const a = await import("@/lib/discord-announce.server");
+    let result: { ok: boolean; reason?: string } | undefined;
     if (data.kind === "welcome") {
       const { data: prof } = await context.supabase.from("profiles").select("discord_id").eq("id", context.userId).maybeSingle();
-      await a.sendWelcome({ userId: prof?.discord_id ?? "0", guildName: "Your Server", websiteUrl: origin });
+      result = await a.sendWelcome({ userId: prof?.discord_id ?? "0", guildName: "Your Server", websiteUrl: origin });
     } else if (data.kind === "tier") {
-      await a.announceTierChange({ player: "Notch", tier: "HT1", region: "NA", gamemodeName: "Crystal PvP", gamemodeIcon: "💎", awardedBy: "Test", websiteOrigin: origin });
+      result = await a.announceTierChange({ player: "Notch", tier: "HT1", region: "NA", gamemodeName: "Crystal PvP", gamemodeIcon: "💎", awardedBy: "Test", websiteOrigin: origin });
     } else {
       const { data: prof } = await context.supabase.from("profiles").select("discord_id, discord_username").eq("id", context.userId).maybeSingle();
-      await a.announceModAction({ action: "WARN", targetId: prof?.discord_id ?? "0", targetName: prof?.discord_username, moderatorId: prof?.discord_id ?? "0", moderatorName: "system", reason: "Test announcement from admin panel" });
+      result = await a.announceModAction({ action: "WARN", targetId: prof?.discord_id ?? "0", targetName: prof?.discord_username, moderatorId: prof?.discord_id ?? "0", moderatorName: "system", reason: "Test announcement from admin panel" });
     }
+    if (!result?.ok) throw new Error(result?.reason ?? "Discord did not accept the message.");
     return { ok: true };
   });
+
+/** Checks the bot's effective permissions in each configured channel. */
+export const checkAnnounceChannelsFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const token = process.env.DISCORD_BOT_TOKEN;
+    if (!token) throw new Error("Bot token is not configured");
+    const { data: cfg } = await context.supabase.from("bot_config").select("*").eq("id", "main").maybeSingle();
+    const targets: Array<{ label: string; id: string | null }> = [
+      { label: "Tier announcements", id: cfg?.tier_announce_channel_id ?? null },
+      { label: "Welcome", id: cfg?.welcome_channel_id ?? null },
+      { label: "Mod log", id: cfg?.mod_log_channel_id ?? null },
+      { label: "Auto-mod log", id: cfg?.automod_log_channel_id ?? null },
+    ];
+    const out: Array<{ label: string; channelId: string | null; ok: boolean; detail: string }> = [];
+    for (const t of targets) {
+      if (!t.id) { out.push({ label: t.label, channelId: null, ok: false, detail: "Not configured" }); continue; }
+      const res = await fetch(`https://discord.com/api/v10/channels/${t.id}`, { headers: { Authorization: `Bot ${token}` } });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        let code: number | undefined;
+        try { code = JSON.parse(txt)?.code; } catch { /* ignore */ }
+        out.push({
+          label: t.label, channelId: t.id, ok: false,
+          detail: code === 50001
+            ? "Bot cannot see this channel — grant View Channel"
+            : res.status === 404 ? "Channel not found" : `Discord ${res.status}`,
+        });
+        continue;
+      }
+      const chan = (await res.json()) as { name?: string };
+      out.push({ label: t.label, channelId: t.id, ok: true, detail: `#${chan.name ?? t.id} — visible. Use the test button to confirm Send Messages / Embed Links.` });
+    }
+    return out;
+  });
+
