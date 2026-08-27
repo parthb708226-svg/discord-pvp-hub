@@ -70,9 +70,10 @@ export async function announceTierChange(opts: {
   isUpdate?: boolean;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.tier_announcements_enabled || !cfg.tier_announce_channel_id) return;
+  if (!cfg?.tier_announcements_enabled) return { ok: false, reason: "Tier announcements are turned off in Admin → Discord Bot." };
+  if (!cfg.tier_announce_channel_id) return { ok: false, reason: "No tier announcement channel selected." };
   const color = COLORS[opts.tier] ?? COLORS.info;
-  await postChannel(cfg.tier_announce_channel_id, {
+  return postChannel(cfg.tier_announce_channel_id, {
     embeds: [{
       title: `${opts.gamemodeIcon ?? "🏆"} ${opts.isUpdate ? "Tier Updated" : "New Tier Awarded"}`,
       description: `**${opts.player}** has been awarded **${opts.tier}** in **${opts.gamemodeName}**`,
@@ -99,8 +100,9 @@ export async function announceTierRemoval(opts: {
   websiteOrigin: string;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.tier_announcements_enabled || !cfg.tier_announce_channel_id) return;
-  await postChannel(cfg.tier_announce_channel_id, {
+  if (!cfg?.tier_announcements_enabled) return { ok: false, reason: "Tier announcements are turned off in Admin → Discord Bot." };
+  if (!cfg.tier_announce_channel_id) return { ok: false, reason: "No tier announcement channel selected." };
+  return postChannel(cfg.tier_announce_channel_id, {
     embeds: [{
       title: "❌ Tier Removed",
       description: `**${opts.player}**'s **${opts.tier}** in **${opts.gamemodeName}** has been removed.`,
@@ -124,10 +126,10 @@ export async function announceModAction(opts: {
   durationMinutes?: number | null;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.mod_log_channel_id) return;
+  if (!cfg?.mod_log_channel_id) return { ok: false, reason: "No mod-log channel selected." };
   const emoji = { WARN: "⚠️", MUTE: "🔇", UNMUTE: "🔊", KICK: "👢", BAN: "🔨", UNBAN: "♻️" }[opts.action];
   const isGood = opts.action === "UNMUTE" || opts.action === "UNBAN";
-  await postChannel(cfg.mod_log_channel_id, {
+  const modResult = await postChannel(cfg.mod_log_channel_id, {
     embeds: [{
       title: `${emoji} ${opts.action}`,
       color: isGood ? COLORS.unmod : COLORS.mod,
@@ -156,6 +158,7 @@ export async function announceModAction(opts: {
       duration_minutes: opts.durationMinutes ?? null,
     });
   } catch (e) { console.error("[mod-actions log]", e); }
+  return modResult;
 }
 
 export async function sendWelcome(opts: {
@@ -164,12 +167,13 @@ export async function sendWelcome(opts: {
   websiteUrl: string;
 }) {
   const cfg = await getBotConfig();
-  if (!cfg?.welcomer_enabled || !cfg.welcome_channel_id) return;
+  if (!cfg?.welcomer_enabled) return { ok: false, reason: "Welcomer is turned off in Admin → Discord Bot." };
+  if (!cfg.welcome_channel_id) return { ok: false, reason: "No welcome channel selected." };
   const msg = (cfg.welcome_message ?? "")
     .replaceAll("{user}", `<@${opts.userId}>`)
     .replaceAll("{guild}", opts.guildName)
     .replaceAll("{website}", opts.websiteUrl);
-  await postChannel(cfg.welcome_channel_id, {
+  return postChannel(cfg.welcome_channel_id, {
     content: msg,
     embeds: [{
       color: COLORS.welcome,
