@@ -81,6 +81,19 @@ function BotConfig() {
             <h2 className="font-bold text-lg">Channel routing</h2>
             <p className="text-sm text-muted-foreground">Where the bot sends each kind of message. Pick a channel from your server.</p>
 
+            {channelsLoading && <p className="text-sm text-muted-foreground">Loading channels from Discord…</p>}
+            {channelsError && (
+              <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm space-y-2">
+                <div className="font-bold">Couldn't load your server's channels</div>
+                <div className="text-muted-foreground">{(channelsError as Error).message}</div>
+                <Button size="sm" variant="outline" onClick={() => refetchChannels()}>Retry</Button>
+              </div>
+            )}
+            {!channelsLoading && !channelsError && channelOptions.length === 0 && (
+              <p className="text-sm text-muted-foreground">No text channels found — invite the bot to the server first (see the Setup tab).</p>
+            )}
+
+
             <ChannelField label="Welcome channel" value={draft.welcome_channel_id} options={channelOptions}
               onChange={v => setDraft({ ...draft, welcome_channel_id: v })} />
             <ChannelField label="Tier announcements" value={draft.tier_announce_channel_id} options={channelOptions}
