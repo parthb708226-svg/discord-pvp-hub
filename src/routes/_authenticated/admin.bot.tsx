@@ -182,8 +182,12 @@ function BotConfig() {
             <Copyable value={interactionsUrl} />
           </Card>
           <Card className="p-6 space-y-3">
-            <h2 className="font-bold text-lg">2. Invite the bot</h2>
-            <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands`} />
+            <h2 className="font-bold text-lg">2. Invite the bot to your server</h2>
+            <p className="text-sm text-muted-foreground">
+              Connected server ID: <code>1542228895674146818</code> (<a className="underline" href="https://discord.gg/5hpefBfQ7g" target="_blank" rel="noreferrer">invite link</a>).
+              After inviting, come back and press "Register all slash commands".
+            </p>
+            <Copyable value={`https://discord.com/oauth2/authorize?client_id=1177585523385188402&permissions=2147551232&scope=bot%20applications.commands&guild_id=1542228895674146818`} />
           </Card>
           <Card className="p-6 space-y-3">
             <h2 className="font-bold text-lg">3. Gateway worker (welcome + chat-gate + XP)</h2>
