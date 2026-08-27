@@ -216,7 +216,7 @@ export const upsertTierFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const { data: actor } = await context.supabase.from("profiles").select("discord_username, minecraft_username").eq("id", context.userId).maybeSingle();
-    const origin = process.env.SITE_ORIGIN ?? "https://discord-pvp-hub.lovable.app";
+    const origin = process.env.SITE_ORIGIN ?? "https://archer-tier-list.lovable.app";
     const { announceTierChange } = await import("@/lib/discord-announce.server");
     await announceTierChange({
       player: data.username, tier: data.tier, region: data.region, gamemodeName: gm.name, gamemodeIcon: gm.icon,
@@ -236,7 +236,7 @@ export const deleteTierFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (row) {
       const { data: actor } = await context.supabase.from("profiles").select("discord_username, minecraft_username").eq("id", context.userId).maybeSingle();
-      const origin = process.env.SITE_ORIGIN ?? "https://discord-pvp-hub.lovable.app";
+      const origin = process.env.SITE_ORIGIN ?? "https://archer-tier-list.lovable.app";
       const { announceTierRemoval } = await import("@/lib/discord-announce.server");
       await announceTierRemoval({
         player: row.minecraft_username, tier: row.tier,
