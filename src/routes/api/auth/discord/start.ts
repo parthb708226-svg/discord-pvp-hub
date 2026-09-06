@@ -4,8 +4,14 @@ export const Route = createFileRoute("/api/auth/discord/start")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const clientId = process.env.DISCORD_CLIENT_ID!;
+        const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID;
         const url = new URL(request.url);
+        if (!clientId) {
+          return new Response(null, {
+            status: 302,
+            headers: { Location: new URL("/auth?error=missing_client_id", url.origin).toString() },
+          });
+        }
         const redirectUri = `${url.origin}/api/auth/discord/callback`;
         const state = crypto.randomUUID();
 
