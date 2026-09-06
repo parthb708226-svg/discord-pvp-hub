@@ -1,1 +1,22 @@
-// placeholder
+####################################################################
+# Netlify configuration for the Archer's Tier List web app.
+#
+# The repository root IS the project root, so there is deliberately
+# no `base` setting here (a wrong `base` such as "/opt/build" makes
+# Netlify fail with "The base directory does not exist").
+#
+# The Discord gateway in /gateway is a SEPARATE long-running service
+# (Railway etc.) and is intentionally not built or deployed here.
+####################################################################
+
+[build]
+  command = "npm run build"
+  # Nitro's netlify preset writes static assets to dist/ and the SSR
+  # handler to .netlify/functions-internal/ (picked up automatically).
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Pin the server output to Netlify Functions so SSR + all
+  # /api routes and server functions work in production.
+  NITRO_PRESET = "netlify"
