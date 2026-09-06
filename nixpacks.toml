@@ -1,0 +1,22 @@
+####################################################################
+# Railway (Nixpacks) build for the Archer's Tier List website.
+#
+# The repository root IS the project root, so no base/root override
+# is needed. The Discord gateway in /gateway is a SEPARATE Railway
+# service and is intentionally not built here.
+####################################################################
+
+[variables]
+NODE_VERSION = "22"
+# Build a plain Node server output instead of the default edge target,
+# so Railway can run it as a long-lived process.
+NITRO_PRESET = "node-server"
+
+[phases.install]
+cmds = ["npm ci --include=dev || npm install --include=dev"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
