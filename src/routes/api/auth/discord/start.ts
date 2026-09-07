@@ -13,16 +13,9 @@ export const Route = createFileRoute("/api/auth/discord/start")({
           });
         }
 
-        // Run the OAuth dance on one canonical host so the redirect URI always
-        // matches what is registered in the Discord developer portal.
-        const canonical = (process.env.SITE_ORIGIN ?? "").trim().replace(/\/+$/, "");
-        if (canonical && !url.origin.includes("localhost") && new URL(canonical).origin !== url.origin) {
-          const hop = new URL("/api/auth/discord/start", canonical);
-          const n = url.searchParams.get("next");
-          if (n) hop.searchParams.set("next", n);
-          return new Response(null, { status: 302, headers: { Location: hop.toString() } });
-        }
-
+        // Always run the OAuth dance on the host the visitor is actually using
+        // (Lovable, Netlify, Railway, custom domain). Each of those callback URLs
+        // must be registered in the Discord developer portal's OAuth2 redirects.
         const redirectUri = `${url.origin}/api/auth/discord/callback`;
         const state = crypto.randomUUID();
 
