@@ -1,0 +1,19 @@
+# Railway build config for the WEBSITE service (repo root).
+# The Discord bot service uses the `gateway/` root directory instead.
+
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = ["npm install --include=dev --no-audit --no-fund"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_VERSION = "22"
+# Build a plain Node server bundle instead of the Cloudflare Worker output.
+NITRO_PRESET = "node_server"
