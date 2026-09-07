@@ -32,7 +32,16 @@ export const Route = createFileRoute("/api/auth/discord/callback")({
               redirect_uri: redirectUri,
             }),
           });
-          if (!tokenRes.ok) return redirectTo("/auth?error=token_exchange", url.origin);
+          if (!tokenRes.ok) {
+            const detail = await tokenRes.text().catch(() => "");
+            console.error("[discord-callback] token exchange failed", tokenRes.status, detail);
+            const reason = /redirect_uri/i.test(detail)
+              ? "redirect_mismatch"
+              : /client/i.test(detail)
+                ? "bad_credentials"
+                : "token_exchange";
+            return redirectTo(`/auth?error=${reason}`, url.origin);
+          }
           const token = await tokenRes.json() as { access_token: string };
 
           // 2) Fetch Discord user
