@@ -77,7 +77,7 @@ if (typeof fetchHandler !== "function") {
       const response = await fetchHandler(
         new Request(url, { method: req.method, headers: req.headers, body }),
         process.env,
-        {},
+        { waitUntil() {}, passThroughOnException() {} },
       );
 
       res.writeHead(response.status, Object.fromEntries(response.headers));
