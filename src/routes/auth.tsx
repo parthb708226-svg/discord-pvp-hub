@@ -46,17 +46,22 @@ function AuthPage() {
         <h1 className="mt-4 text-3xl font-extrabold">Sign in</h1>
         <p className="mt-2 text-sm text-muted-foreground">Use your Discord account. Your roles are tied to your Discord identity.</p>
         {search.error && (
-          <p role="alert" className="mt-4 text-sm text-destructive">
-            {search.error === "missing_client_id"
-              ? "Sign-in isn't set up on this address yet: the Discord app ID is missing from the hosting settings."
-              : search.error === "redirect_mismatch"
-                ? "Discord rejected the return address. Add this site's address + /api/auth/discord/callback to the Discord app's allowed redirects."
-                : search.error === "bad_credentials"
-                  ? "Discord rejected the app ID or secret saved for this site. Please re-check those two values."
-                  : search.error === "bad_state"
-                    ? "Sign-in expired or was opened in a different browser. Please try again."
-                    : "Sign-in failed (" + search.error + "). Please try again."}
-          </p>
+          <div className="mt-4 text-sm text-destructive">
+            <p role="alert">
+              {search.error === "missing_client_id"
+                ? "Sign-in isn't set up on this address yet: the Discord app ID is missing from the hosting settings."
+                : search.error === "redirect_mismatch"
+                  ? "Discord rejected the return address. Add this site's address + /api/auth/discord/callback to the Discord app's allowed redirects."
+                  : search.error === "bad_credentials"
+                    ? "Discord rejected the app ID or secret saved for this site. Please re-check those two values."
+                    : search.error === "bad_state"
+                      ? "Sign-in expired or was opened in a different browser. Please try again."
+                      : "Sign-in failed (" + search.error + "). Please try again."}
+            </p>
+            <a href="/api/public/auth/diagnose" className="mt-2 inline-block underline text-muted-foreground hover:text-primary">
+              Check this site's sign-in settings
+            </a>
+          </div>
         )}
         <Button asChild className="mt-6 w-full bg-[#5865F2] hover:bg-[#4752c4] text-white h-12 text-base">
           <a href={`/api/auth/discord/start${safeNext ? `?next=${encodeURIComponent(safeNext)}` : ""}`}>

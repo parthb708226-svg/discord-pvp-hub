@@ -31,6 +31,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicGatewayEventRouteImport } from './routes/api/public/gateway/event'
 import { Route as ApiPublicDiscordInteractionsRouteImport } from './routes/api/public/discord/interactions'
+import { Route as ApiPublicAuthDiagnoseRouteImport } from './routes/api/public/auth/diagnose'
 import { Route as ApiAuthDiscordStartRouteImport } from './routes/api/auth/discord/start'
 import { Route as ApiAuthDiscordCallbackRouteImport } from './routes/api/auth/discord/callback'
 
@@ -149,6 +150,11 @@ const ApiPublicDiscordInteractionsRoute =
     path: '/api/public/discord/interactions',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAuthDiagnoseRoute = ApiPublicAuthDiagnoseRouteImport.update({
+  id: '/api/public/auth/diagnose',
+  path: '/api/public/auth/diagnose',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthDiscordStartRoute = ApiAuthDiscordStartRouteImport.update({
   id: '/api/auth/discord/start',
   path: '/api/auth/discord/start',
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/auth/diagnose': typeof ApiPublicAuthDiagnoseRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
   '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/auth/diagnose': typeof ApiPublicAuthDiagnoseRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
   '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
@@ -233,6 +241,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/auth/discord/callback': typeof ApiAuthDiscordCallbackRoute
   '/api/auth/discord/start': typeof ApiAuthDiscordStartRoute
+  '/api/public/auth/diagnose': typeof ApiPublicAuthDiagnoseRoute
   '/api/public/discord/interactions': typeof ApiPublicDiscordInteractionsRoute
   '/api/public/gateway/event': typeof ApiPublicGatewayEventRoute
 }
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
+    | '/api/public/auth/diagnose'
     | '/api/public/discord/interactions'
     | '/api/public/gateway/event'
   fileRoutesByTo: FileRoutesByTo
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
+    | '/api/public/auth/diagnose'
     | '/api/public/discord/interactions'
     | '/api/public/gateway/event'
   id:
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/api/auth/discord/callback'
     | '/api/auth/discord/start'
+    | '/api/public/auth/diagnose'
     | '/api/public/discord/interactions'
     | '/api/public/gateway/event'
   fileRoutesById: FileRoutesById
@@ -329,6 +341,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAuthDiscordCallbackRoute: typeof ApiAuthDiscordCallbackRoute
   ApiAuthDiscordStartRoute: typeof ApiAuthDiscordStartRoute
+  ApiPublicAuthDiagnoseRoute: typeof ApiPublicAuthDiagnoseRoute
   ApiPublicDiscordInteractionsRoute: typeof ApiPublicDiscordInteractionsRoute
   ApiPublicGatewayEventRoute: typeof ApiPublicGatewayEventRoute
 }
@@ -489,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDiscordInteractionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/diagnose': {
+      id: '/api/public/auth/diagnose'
+      path: '/api/public/auth/diagnose'
+      fullPath: '/api/public/auth/diagnose'
+      preLoaderRoute: typeof ApiPublicAuthDiagnoseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/discord/start': {
       id: '/api/auth/discord/start'
       path: '/api/auth/discord/start'
@@ -556,6 +576,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAuthDiscordCallbackRoute: ApiAuthDiscordCallbackRoute,
   ApiAuthDiscordStartRoute: ApiAuthDiscordStartRoute,
+  ApiPublicAuthDiagnoseRoute: ApiPublicAuthDiagnoseRoute,
   ApiPublicDiscordInteractionsRoute: ApiPublicDiscordInteractionsRoute,
   ApiPublicGatewayEventRoute: ApiPublicGatewayEventRoute,
 }
