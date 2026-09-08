@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/auth/discord/start")({
         }
 
         // Always run the OAuth dance on the host the visitor is actually using
-        // (Lovable, Netlify, Railway, custom domain). Each of those callback URLs
+        // (Lovable, Railway, or a custom domain). Each of those callback URLs
         // must be registered in the Discord developer portal's OAuth2 redirects.
         const redirectUri = `${url.origin}/api/auth/discord/callback`;
         const state = crypto.randomUUID();
